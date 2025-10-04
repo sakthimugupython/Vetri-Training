@@ -1,0 +1,196 @@
+/* Custom styles for trainee_list.html to match the provided UI */
+
+
+.sidebar {
+    background: #222e3a;
+    color: #fff;
+    min-height: 100vh;
+    width: 230px;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 100;
+}
+.sidebar .logo {
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 32px 0 24px 0;
+    text-align: center;
+    letter-spacing: 1px;
+}
+.sidebar .logo span { color: #52fe97; font-style: italic; }
+.sidebar .nav-link {
+    color: #b6c6d6;
+    font-size: 1.08rem;
+    padding: 12px 32px;
+    border-radius: 8px 0 0 8px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s, color 0.2s;
+}
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: #3865ff;
+    color: #fff;
+}
+.sidebar .nav-link i { margin-right: 12px; }
+
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: #3862f8;
+    color: #fff;
+}
+
+.main-content {
+    margin-left: 260px;
+    padding: 0px 10px 0 10px;
+}
+
+.trainee-header {
+    color: #fff;
+    padding: 24px 32px 18px 32px;
+    margin-bottom: 32px;
+}
+.trainee-header h3 {
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+.trainee-header .user-info {
+    border-radius: 24px;
+    padding: 8px 18px;
+    font-weight: 600;
+    color: #fff;
+    font-size:0.95em;
+    color:#8ec3ff;
+}
+.trainee-header i {
+    font-size: 1.3rem;
+    margin-right: 12px;
+    color: #fff;
+}
+
+.trainee-stat-card {
+    border-radius: 16px;
+    padding: 18px 0;
+    text-align: center;
+    box-shadow: 0 2px 8px #0001;
+    margin-bottom: 12px;
+}
+
+.trainee-stat-card .fa-user-graduate {
+    font-size: 2.2rem;
+}
+.trainee-stat-card .fa-check {
+    font-size: 2.2rem;
+}
+.trainee-stat-card .fa-clock {
+    font-size: 2.2rem;
+}
+.trainee-stat-card .fa-flag-checkered {
+    font-size: 2.2rem;
+}
+
+.trainee-stat-card {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.trainee-stat-card {
+    background: linear-gradient(180deg, #B27AFF 0%, #7498FE 100%);
+    color:white
+}
+
+.btn-success {
+    background: linear-gradient(90deg,#00ea5e 0%,#04682d 100%);
+    border: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    padding: 10px 32px;
+}
+
+
+.table-responsive {
+    margin-top: 24px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px #0001;
+}
+.table {
+    background: #fff;
+    border-radius: 0 0 16px 16px;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.table thead {
+    background: #a259ff;
+    color: #fff;
+    font-size: 1.1rem;
+}
+.table th {
+    vertical-align: middle;
+    text-align: center;
+    font-size: 1.08rem;
+    font-weight: 600;
+    padding: 16px 8px;
+    border-right: 1px solid #c7a6ff;
+    border-bottom: 2px solid #a259ff;
+}
+.table th:last-child {
+    border-right: none;
+}
+.table td {
+    vertical-align: middle;
+    text-align: center;
+    font-size: 1.05rem;
+    padding: 14px 8px;
+    border-right: 1px solid #e3d6ff;
+    border-bottom: 1px solid #e3d6ff;
+}
+.table td:last-child {
+    border-right: none;
+}
+.table tbody tr {
+    background: #fff;
+    transition: background 0.2s;
+}
+.table tbody tr:hover {
+    background: #f6f7ff;
+}
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+.table .btn-success {
+    background: linear-gradient(90deg,#00ea5e 0%,#04682d 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.08rem;
+    border-radius: 8px;
+    padding: 8px 24px;
+    border: none;
+    box-shadow: 0 2px 8px #0001;
+    transition: background 0.2s;
+}
+
+.dropdown .btn {
+    background: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #23243a;
+    border: none;
+    box-shadow: 0 2px 8px #0001;
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        min-width: 60px;
+        padding: 12px 0 0 0;
+    }
+    .main-content {
+        margin-left: 60px;
+        padding: 18px 8px 0 8px;
+    }
+    .trainee-header {
+        padding: 18px 8px 12px 8px;
+    }
+}

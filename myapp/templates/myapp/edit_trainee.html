@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Trainee</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainee_list.css' %}">
+</head>
+<body>
+    {% include 'myapp/_sidebar.html' %}
+    <div class="main-content">
+        <div class="trainee-header" style="background:#3865ff;color:#fff;padding:14px 32px 18px 32px;">
+            <h3 class="mb-1" style="font-weight:700;">Edit Trainee</h3>
+        </div>
+        <div class="card p-4" style="max-width:700px;margin:0 auto;box-shadow:0 2px 12px #0001;border-radius:16px;">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Trainee Name</label>
+                        <input type="text" class="form-control" name="name" value="{{ trainee.user.first_name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Trainee Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ trainee.user.email }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" name="phone" value="{{ trainee.phone|default:'' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Enrolled Course</label>
+                        <select class="form-select" name="course">
+                            {% for course in courses %}
+                            <option value="{{ course.id }}" {% if trainee.course and trainee.course.id == course.id %}selected{% endif %}>{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Trainer Assigned</label>
+                        <select class="form-select" name="trainer">
+                            <option value="">-- Select Trainer --</option>
+                            {% for trainer in trainers %}
+                            <option value="{{ trainer.id }}" {% if trainee.trainer and trainee.trainer.id == trainer.id %}selected{% endif %}>{{ trainer.user.get_full_name|default:trainer.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Batch</label>
+                        <input type="text" class="form-control" name="batch" value="{{ trainee.batch|default:'' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Progress</label>
+                        <input type="number" class="form-control" name="progress" min="0" max="100" value="{{ trainee.progress|default:'0' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Certificate Status</label>
+                        <select class="form-select" name="certificate_status">
+                            <option value="Issued" {% if trainee.certificate_status == 'Issued' %}selected{% endif %}>Issued</option>
+                            <option value="Not Issued" {% if trainee.certificate_status == 'Not Issued' %}selected{% endif %}>Not Issued</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Account Status</label>
+                        <select class="form-select" name="status">
+                            <option value="Active" {% if trainee.status == 'Active' %}selected{% endif %}>Active</option>
+                            <option value="On Hold" {% if trainee.status == 'On Hold' %}selected{% endif %}>On Hold</option>
+                            <option value="Completed" {% if trainee.status == 'Completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Registered Date</label>
+                        <input type="text" class="form-control" name="registered_date" value="{{ trainee.user.date_joined|date:'d M Y' }}" readonly>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'trainee_list' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

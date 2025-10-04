@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Trainers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainer_list.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    {% include 'myapp/_sidebar.html' %}
+    <div class="main-content" style="margin-left:240px;">
+        <div class="trainer-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h3 class="trainer-title">Manage Trainers</h3>
+                <div class="trainer-subtitle">View and manage all active trainers and assign them to courses.</div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-envelope"></i>
+                <i class="fas fa-bell"></i>
+                <div class="user-info ms-2">
+                    <div class="user-role"><span style="font-size:0.95em;color:#8ec3ff;">VTS Admin</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="trainer-stats">
+            <div class="trainer-stat"><i class="fas fa-chalkboard-teacher"></i> Total Trainers <div style="font-size:2rem;">{{ total_trainers }}</div></div>
+            <div class="trainer-stat"><i class="fas fa-check-square"></i> Active Trainers <div style="font-size:2rem;">{{ active_trainers }}</div></div>
+            <div class="trainer-stat"><i class="fas fa-chart-bar"></i> Avg Course Rating <div style="font-size:2rem;">{{ avg_course_rating }}</div></div>
+            <div class="trainer-stat"><i class="fas fa-box"></i> Total Courses <div style="font-size:2rem;">{{ total_courses }}</div></div>
+        </div>
+        <div class="d-flex justify-content-end mb-4">
+            <a href="{% url 'add_trainer' %}" class="btn btn-primary" style="background:linear-gradient(90deg,#a259ff 0%,#38b6ff 100%);color:#fff;font-weight:600;font-size:1.1rem;padding:10px 32px;border-radius:8px;box-shadow:0 2px 8px rgba(56,101,255,0.08);">+ Add New Trainer</a>
+        </div>
+        <div class="trainer-cards">
+            {% for trainer in trainers %}
+            <div class="trainer-card" style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(56,101,255,0.08);padding:24px 18px 18px 18px;max-width:400px;margin:24px auto;">
+                <div style="display:flex;justify-content:center;align-items:center;margin-bottom:12px;">
+                    <img src="{% if trainer.profile_image %}{{ trainer.profile_image.url }}{% else %}{% static 'myapp/img/default-avatar.png' %}{% endif %}" class="trainer-avatar" style="width:150px;height:140px;border-radius:50%;border:4px solid #a259ff;object-fit:cover;">
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center" class="w-75">
+                    <div>
+                        <div style="font-size:1.3rem;font-weight:700;color:#6c63ff;">{{ trainer.user.get_full_name|default:trainer.user.username }}</div>
+                        <div style="font-size:1rem;color:#444;font-weight:500;">{{ trainer.expertise }}</div>
+                    </div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#222;">{{ trainer.trainer_code }}</div>
+                </div>
+                <div style="background:linear-gradient(120deg,#a259ff 0%,#38b6ff 100%);border-radius:14px;padding:18px 18px 12px 18px;margin:18px 0 12px 0;color:#fff;box-shadow:0 2px 8px rgba(56,101,255,0.08);">
+                    <div style="margin-bottom:6px;"><i class="fas fa-envelope"></i> <span style="margin-left:8px;">{{ trainer.user.email }}</span></div>
+                    <div style="margin-bottom:6px;"><i class="fas fa-phone"></i> <span style="margin-left:8px;">{{ trainer.phone|default:'---' }}</span></div>
+                    <div style="margin-bottom:6px;"><i class="fas fa-book"></i> <span style="margin-left:8px;">{{ trainer.assign_courses|default:'---' }}</span></div>
+                    <div style="margin-bottom:6px;"><i class="fas fa-layer-group"></i> <span style="margin-left:8px;">{{ trainer.batches|default:'0' }}</span></div>
+                    <div style="margin-bottom:6px;"><i class="fas fa-users"></i> <span style="margin-left:8px;">{{ trainer.trainees_count|default:'0' }}</span></div>
+                    <div style="margin-bottom:6px;">
+                        <i class="fas fa-circle" style="color:{{ trainer.status_color }};"></i>
+                        <span style="margin-left:8px;">{{ trainer.status }}</span>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:center;gap:12px;">
+                    <a href="{% url 'edit_trainer' trainer.id %}" class="btn btn-success" style="background:linear-gradient(90deg,#00ea5e 0%,#04682d 100%);border:none;font-weight:700;font-size:1.1rem;border-radius:8px;padding:10px 32px;">Edit</a>
+                    <a href="{% url 'delete_trainer' trainer.id %}" class="btn btn-danger" style="font-weight:700;font-size:1.1rem;border-radius:8px;padding:10px 32px;">Delete</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">No trainers found.</div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

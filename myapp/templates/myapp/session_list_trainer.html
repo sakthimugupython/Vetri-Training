@@ -1,0 +1,350 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Session Recordings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainer_dashboard.css' %}">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #934CD2 0%, #3B82F6 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --danger-gradient: linear-gradient(135deg, #FF5252 0%, #E53935 100%);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sessions-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 8px 25px rgba(147, 76, 210, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .session-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .session-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        .session-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .session-meta {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .session-description {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .batch-badge {
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .video-container {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+        }
+
+        .action-buttons {
+            margin-top: 20px;
+        }
+
+        .btn-delete {
+            background: var(--danger-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 82, 82, 0.4);
+        }
+
+        .no-sessions {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .no-sessions i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .upload-prompt {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border: 1px solid #c3e6cb;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-prompt h5 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+
+        .btn-upload {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(147, 76, 210, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    {% include 'trainer/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <!-- Header Section -->
+            <div class="sessions-header">
+                <h2><i class="fas fa-play-circle me-3"></i>My Session Recordings</h2>
+                <p>Manage and view all your uploaded session recordings</p>
+            </div>
+
+            <div class="container">
+                <!-- Upload Prompt -->
+                <div class="upload-prompt">
+                    <h5><i class="fas fa-info-circle me-2"></i>Upload New Session</h5>
+                    <p>Share your daily session recordings with trainees by selecting their batch.</p>
+                    <a href="{% url 'upload_session' %}" class="btn-upload">
+                        <i class="fas fa-plus"></i>
+                        Upload New Session
+                    </a>
+                </div>
+
+                <!-- Batch-wise Statistics Table -->
+                {% if batch_stats %}
+                <div class="upload-card">
+                    <h5 class="mb-4">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Batch-wise Upload Statistics
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th><i class="fas fa-users me-2"></i>Batch</th>
+                                    <th><i class="fas fa-upload me-2"></i>Total Uploads</th>
+                                    <th><i class="fas fa-check-circle me-2"></i>Successful</th>
+                                    <th><i class="fas fa-times-circle me-2"></i>Failed</th>
+                                    <th><i class="fas fa-clock me-2"></i>Pending</th>
+                                    <th><i class="fas fa-percentage me-2"></i>Success Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for batch, stats in batch_stats.items %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">Batch {{ batch }}</span>
+                                    </td>
+                                    <td><strong>{{ stats.total }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-success">{{ stats.success }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger">{{ stats.failed }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ stats.pending }}</span>
+                                    </td>
+                                    <td>
+                                        {% if stats.total > 0 %}
+                                        <span class="badge {% if stats.success|floatformat:0 >= 80 %}bg-success{% elif stats.success|floatformat:0 >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ stats.success|floatformat:0 }}%
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sessions %}
+                <div class="row">
+                    {% for session in sessions %}
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="session-card" style="cursor: pointer;" onclick="window.location.href='{% url 'session_detail' session.id %}'">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="session-title">
+                                    <i class="fas fa-video me-2 text-primary"></i>
+                                    {{ session.title }}
+                                </h5>
+                                <div class="d-flex gap-2">
+                                    <span class="badge {% if session.upload_status == 'success' %}bg-success{% elif session.upload_status == 'failed' %}bg-danger{% else %}bg-warning{% endif %}">
+                                        {% if session.upload_status == 'success' %}
+                                            <i class="fas fa-check-circle me-1"></i>Success
+                                        {% elif session.upload_status == 'failed' %}
+                                            <i class="fas fa-times-circle me-1"></i>Failed
+                                        {% else %}
+                                            <i class="fas fa-clock me-1"></i>Pending
+                                        {% endif %}
+                                    </span>
+                                    <span class="badge {% if session.is_visible %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {% if session.is_visible %}
+                                            <i class="fas fa-eye me-1"></i>Visible
+                                        {% else %}
+                                            <i class="fas fa-eye-slash me-1"></i>Hidden
+                                        {% endif %}
+                                    </span>
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ session.upload_date|date:"M d, Y" }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="batch-badge">
+                                <i class="fas fa-users me-1"></i>
+                                Batch {{ session.batch }}
+                            </div>
+
+                            <div class="session-meta mb-3">
+                                <i class="fas fa-clock me-1"></i>
+                                Uploaded: {{ session.upload_date|date:"h:i A" }}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-eye me-1"></i>
+                                Visible to Batch {{ session.batch }}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-mouse-pointer me-1"></i>
+                                Click to view details
+                            </div>
+
+                            {% if session.description %}
+                            <div class="session-description">
+                                <strong>Description:</strong><br>
+                                {{ session.description|truncatechars:100 }}
+                            </div>
+                            {% endif %}
+
+                            <div class="video-container">
+                                {% if session.session_url %}
+                                <div class="d-flex align-items-center justify-content-center flex-column" style="height: 200px; background: #f8f9fa;">
+                                    <i class="fas fa-link fa-3x mb-3 text-primary"></i>
+                                    <div style="font-size: 0.9em; color: #6c757d; margin-bottom: 15px;">
+                                        Click card to view details
+                                    </div>
+                                    <a href="{{ session.session_url }}" target="_blank" class="btn btn-primary btn-sm" onclick="event.stopPropagation();">
+                                        <i class="fas fa-external-link-alt me-2"></i>
+                                        Quick View
+                                    </a>
+                                </div>
+                                {% else %}
+                                <div class="d-flex align-items-center justify-content-center" style="height: 200px; background: #f8f9fa;">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                                        <p>Session URL not available</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="action-buttons text-end mt-3">
+                                <div class="btn-group" role="group">
+                                    <form method="post" action="{% url 'toggle_session_visibility' session.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm {% if session.is_visible %}btn-outline-warning{% else %}btn-outline-success{% endif %}" title="{% if session.is_visible %}Hide from trainees{% else %}Show to trainees{% endif %}">
+                                            {% if session.is_visible %}
+                                                <i class="fas fa-eye-slash me-1"></i>Hide
+                                            {% else %}
+                                                <i class="fas fa-eye me-1"></i>Show
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'delete_session' session.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this session? This action cannot be undone.')">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-sessions">
+                    <i class="fas fa-video-slash"></i>
+                    <h4>No Session Recordings Found</h4>
+                    <p>You haven't uploaded any session recordings yet.</p>
+                    <a href="{% url 'upload_session' %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus me-2"></i>Upload Your First Session
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript removed as delete functionality is no longer needed -->
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+<h2>Trainee Attendance</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Trainee</th>
+            <th>Course</th>
+            <th>Present Days</th>
+            <th>Absent Days</th>
+            <th>Total Days</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in attendance_data %}
+        <tr>
+            <td>{{ row.trainee.user.get_full_name|default:row.trainee.user.username }}</td>
+            <td>{{ row.trainee.course.name }}</td>
+            <td>{{ row.present_days }}</td>
+            <td>{{ row.absent_days }}</td>
+            <td>{{ row.total_days }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

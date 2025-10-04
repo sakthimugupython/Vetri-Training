@@ -1,0 +1,427 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Daily Assessment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainer_dashboard.css' %}">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #934CD2 0%, #3B82F6 100%);
+            --success-gradient: linear-gradient(135deg, #00EA5E 0%, #00C851 100%);
+            --warning-gradient: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            --danger-gradient: linear-gradient(135deg, #FF5252 0%, #E53935 100%);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .assessment-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 8px 25px rgba(147, 76, 210, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .assessment-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="85" cy="15" r="20" fill="rgba(255,255,255,0.05)"/><circle cx="15" cy="85" r="15" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="50" r="25" fill="rgba(255,255,255,0.03)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .assessment-header h2 {
+            position: relative;
+            z-index: 2;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        .assessment-header .subtitle {
+            position: relative;
+            z-index: 2;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .assessment-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e9ecef;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: #934CD2;
+            width: 16px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: #934CD2;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(147, 76, 210, 0.1);
+        }
+
+        .form-control[readonly] {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .task-summary {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+            border: 1px solid #d1e9ff;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .task-stat {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .task-stat.total {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .task-stat.completed {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .task-stat.pending {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
+        .task-stat.remaining {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        .task-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .task-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(147, 76, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 76, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .assessment-card {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .task-stat {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    {% include 'trainer/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header Section -->
+        <div class="assessment-header">
+            <a href="{% url 'trainer_trainee_list' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Trainees
+            </a>
+            <h2><i class="fas fa-tasks me-3"></i>Update Daily Assessment</h2>
+            <div class="subtitle">
+                <i class="fas fa-user me-2"></i>
+                <strong>{{ trainee.user.get_full_name|default:trainee.user.username }}</strong>
+                {% if trainee.course %} • {{ trainee.course.name }}{% endif %}
+                {% if trainee.batch %} • Batch {{ trainee.batch }}{% endif %}
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Task Summary Cards -->
+                    <div class="task-summary">
+                        <h5 class="mb-4 text-center">
+                            <i class="fas fa-chart-bar me-2"></i>Task Overview
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="task-stat total">
+                                    <span class="task-value">{{ total_task }}</span>
+                                    <span class="task-label">Total Tasks</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="task-stat completed">
+                                    <span class="task-value">{{ completed_task }}</span>
+                                    <span class="task-label">Total Completed</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="task-stat pending">
+                                    <span class="task-value">{{ pending_completed }}</span>
+                                    <span class="task-label">Total Pending Done</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="task-stat remaining">
+                                    <span class="task-value">{{ remaining_task }}</span>
+                                    <span class="task-label">Remaining</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assessment Form -->
+                    <div class="assessment-card">
+                        <h4 class="mb-4">
+                            <i class="fas fa-edit me-2"></i>Update Task Information
+                        </h4>
+
+                        <form method="post" id="taskForm">
+                            {% csrf_token %}
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="daily_task" class="form-label">
+                                            <i class="fas fa-calendar-day"></i>Daily Tasks
+                                        </label>
+                                        <input type="number" class="form-control" id="daily_task" name="daily_task"
+                                               min="0" value="{{ daily_task }}" placeholder="Enter daily tasks" required>
+                                        <div class="form-text">Number of tasks assigned for today</div>
+                                        <div class="form-text"><strong>Workflow:</strong> Daily assignment → Next day completion → Track remaining tasks</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="completed_task" class="form-label">
+                                            <i class="fas fa-check-circle"></i>Today's Completed Tasks
+                                        </label>
+                                        <input type="number" class="form-control" id="completed_task" name="completed_task"
+                                               min="0" value="0" placeholder="Tasks completed today" required>
+                                        <div class="form-text">Tasks finished today (will be added to total)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="pending_completed" class="form-label">
+                                            <i class="fas fa-clock"></i>Today's Pending Tasks Completed
+                                        </label>
+                                        <input type="number" class="form-control" id="pending_completed" name="pending_completed"
+                                               min="0" value="0" placeholder="Previously pending tasks completed today">
+                                        <div class="form-text">Previously pending tasks completed today (will be added to total)</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="total_task" class="form-label">
+                                            <i class="fas fa-list-ol"></i>Total Tasks (All Time)
+                                        </label>
+                                        <input type="number" class="form-control" id="total_task" value="{{ total_task }}"
+                                               readonly placeholder="Auto-calculated from assessments">
+                                        <div class="form-text">Total tasks from all daily assessments</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="remaining_task" class="form-label">
+                                    <i class="fas fa-calculator"></i>Remaining Tasks
+                                </label>
+                                <input type="number" class="form-control" id="remaining_task" value="{{ remaining_task }}"
+                                       readonly placeholder="Auto-calculated">
+                                <div class="form-text">Automatically calculated: (Daily incomplete) + (Previous pending - Pending completed)</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label">
+                                    <i class="fas fa-sticky-note"></i>Remarks/Notes
+                                </label>
+                                <textarea class="form-control" id="remarks" name="remarks" rows="4"
+                                          placeholder="Add any notes or feedback about today's tasks...">{{ trainee.remarks|default:'' }}</textarea>
+                                <div class="form-text">Optional notes about task completion or challenges faced</div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Assessment
+                                </button>
+                                <a href="{% url 'trainer_trainee_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateRemainingTask() {
+            const dailyTask = parseInt(document.getElementById('daily_task').value) || 0;
+            const completedTask = parseInt(document.getElementById('completed_task').value) || 0;
+            const pendingCompleted = parseInt(document.getElementById('pending_completed').value) || 0;
+            const totalTask = parseInt(document.getElementById('total_task').value) || 0;
+
+            // Calculate remaining using the corrected logic:
+            // Remaining = (Daily incomplete) + (Previous pending - Pending completed)
+            const newDailyIncomplete = Math.max(dailyTask - completedTask, 0);
+            const previousPending = Math.max(totalTask - dailyTask, 0) || 0;
+            const remaining = newDailyIncomplete + Math.max(previousPending - pendingCompleted, 0);
+
+            document.getElementById('remaining_task').value = remaining;
+
+            // Update the summary cards to reflect changes
+            updateSummaryCards(completedTask, pendingCompleted, remaining, dailyTask);
+        }
+
+        function updateSummaryCards(completed, pending, remaining, daily) {
+            // Update the visual summary cards
+            const completedCard = document.querySelector('.task-stat.completed .task-value');
+            const pendingCard = document.querySelector('.task-stat.pending .task-value');
+            const remainingCard = document.querySelector('.task-stat.remaining .task-value');
+
+            if (completedCard) completedCard.textContent = completed;
+            if (pendingCard) pendingCard.textContent = pending;
+            if (remainingCard) remainingCard.textContent = remaining;
+
+            // Total is calculated server-side, don't modify it in JavaScript
+            // The total card should remain as-is since it's calculated from database
+        }
+
+        // Add event listeners for real-time calculation
+        document.getElementById('completed_task').addEventListener('input', updateRemainingTask);
+        document.getElementById('pending_completed').addEventListener('input', updateRemainingTask);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRemainingTask();
+        });
+    </script>
+</body>
+</html>

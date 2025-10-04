@@ -1,0 +1,216 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainer_dashboard.css' %}">
+</head>
+<body>
+    <!-- Sidebar -->
+    {% include 'trainer/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header d-flex justify-content-between align-items-center">
+            <div class="fw-bold fs-4 text-light">Trainer Dashboard</div>
+            <div class="user-info">
+                <form method="post" action="" class="d-inline-block me-3">
+                    {% csrf_token %}
+                    {% if trainer.admin_locked %}
+                        <span class="status-label offline">Offline (Admin)</span>
+                    {% else %}
+                        <button type="submit" name="toggle_status" value="toggle" class="btn btn-sm {% if trainer.status == 'Active' %}btn-success{% else %}btn-secondary{% endif %}">
+                            {% if trainer.status == 'Active' %}Go Offline{% else %}Go Online{% endif %}
+                        </button>
+                        <span class="status-label {% if trainer.status == 'Active' %}text-light{% else %}offline{% endif %}">
+                            {% if trainer.status == 'Active' %}Online{% else %}Offline{% endif %}
+                        </span>
+                    {% endif %}
+                </form>
+                {% if trainer.profile_image %}
+                    <img src="{{ trainer.profile_image.url }}" alt="Profile">
+                {% else %}
+                    <img src="{% static 'myapp/images/default_profile.png' %}" alt="Profile">
+                {% endif %}
+                <span class="text-light fw-bold">{{ user.get_full_name|default:user.username }}</span>
+            </div>
+        </div>
+        <div class="container-fluid py-4">
+            <!-- Stats Cards -->
+            <div class="row stats-row g-3">
+                <div class="col-md-3">
+                    <div class="card stats-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-chalkboard-teacher fa-2x mb-2 text-primary"></i>
+                            <div class="card-title">Assigned Courses</div>
+                            <div class="card-text">{{ assigned_courses_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-2x mb-2 text-success"></i>
+                            <div class="card-title">Total Trainees</div>
+                            <div class="card-text">{{ total_trainees }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-clock fa-2x mb-2 text-warning"></i>
+                            <div class="card-title">Active Batches</div>
+                            <div class="card-text">{{ trainer.batches }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-chart-line fa-2x mb-2 text-info"></i>
+                            <div class="card-title">Online Status</div>
+                            <div class="card-text">
+                                <span class="badge {% if trainer.status == 'Active' %}bg-success{% else %}bg-secondary{% endif %} fs-6">
+                                    {% if trainer.status == 'Active' %}Online{% else %}Offline{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Course Distribution Chart and Recent Trainees -->
+            <div class="row">
+                <div class="col-lg-7 mb-4">
+                    <div class="card-section">
+                        <h5 class="section-title">Course Distribution</h5>
+                        <div class="chart-container">
+                            <canvas id="courseDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 mb-4">
+                    <div class="card-section">
+                        <h5 class="section-title">All Trainees</h5>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table recent-trainees-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Course</th>
+                                        <th>Attendance</th>
+                                        <th>Status</th>
+                                        <th>Batch</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for trainee in recent_trainees %}
+                                    <tr>
+                                        <td>{{ trainee.name }}</td>
+                                        <td>{{ trainee.course }}</td>
+                                        <td>
+                                            <span class="badge {% if trainee.attendance_today == 'present' %}bg-success{% elif trainee.attendance_today == 'absent' %}bg-danger{% elif trainee.attendance_today == 'informed' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                                {{ trainee.attendance_today|title|default:"Not Marked" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-status {% if trainee.status == 'Active' %}active{% else %}inactive{% endif %}">
+                                                {{ trainee.status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ trainee.batch|default:"Not Assigned" }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No trainees found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Course List Table -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card-section card-table">
+                        <h5 class="section-title">My Courses</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Course Name</th>
+                                        <th>Mode</th>
+                                        <th>Category</th>
+                                        <th>Trainees</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for course in course_stats %}
+                                    <tr>
+                                        <td>{{ course.code }}</td>
+                                        <td>{{ course.name }}</td>
+                                        <td>
+                                            <span class="badge {% if course.mode == 'online' %}bg-info{% else %}bg-primary{% endif %}">
+                                                {{ course.mode|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ course.category|title }}</td>
+                                        <td>{{ course.trainees_count }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No courses assigned</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Parse JSON data for Chart.js
+        const courseLabels = JSON.parse('{{ course_labels|escapejs }}');
+        const courseCounts = JSON.parse('{{ course_counts|escapejs }}');
+        const ctx = document.getElementById('courseDistributionChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: courseLabels,
+                datasets: [{
+                    data: courseCounts,
+                    backgroundColor: [
+                        '#0d6efd',
+                        '#00EA5E',
+                        '#ffc107',
+                        '#0dcaf0',
+                        '#fd7e14'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

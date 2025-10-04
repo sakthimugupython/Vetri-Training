@@ -1,0 +1,1015 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ trainee_info.name }} - Attendance Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #9747FF;
+            --secondary-color: #3865ff;
+            --success-color: #00EA5E;
+            --warning-color: #FF9800;
+            --danger-color: #FF5252;
+            --dark-bg: #23243a;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Modern Sidebar Styling */
+        .sidebar {
+            background: var(--dark-bg) !important;
+            box-shadow: 0 0 20px rgba(151, 71, 255, 0.15);
+            border-radius: 0 20px 20px 0;
+        }
+
+        .sidebar .logo {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 0 15px 15px 0;
+            margin: 0;
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        .sidebar nav .nav-link {
+            color: #adb5bd !important;
+            padding: 0.75rem 1.5rem;
+            margin: 0.25rem 0;
+            border-radius: 0 25px 25px 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar nav .nav-link:hover {
+            background: rgba(151, 71, 255, 0.2) !important;
+            color: var(--primary-color) !important;
+            transform: translateX(5px);
+        }
+
+        .sidebar nav .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(151, 71, 255, 0.3);
+        }
+
+        /* Header Section */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 8px 25px rgba(151, 71, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="85" cy="15" r="20" fill="rgba(255,255,255,0.05)"/><circle cx="15" cy="85" r="15" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="50" r="25" fill="rgba(255,255,255,0.03)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .trainee-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .trainee-info h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .trainee-info .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .stat-present .stat-icon {
+            background: linear-gradient(135deg, var(--success-color) 0%, #00C851 100%);
+            color: white;
+        }
+
+        .stat-absent .stat-icon {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+            color: white;
+        }
+
+        .stat-total .stat-icon {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .stat-percentage .stat-icon {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Attendance Table */
+        .attendance-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .attendance-table {
+            margin: 0;
+        }
+
+        .attendance-table thead th {
+            background: #f8f9fa;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+
+        .attendance-table tbody td {
+            padding: 1.25rem 1rem;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .attendance-table tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        .attendance-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-present {
+            background: linear-gradient(135deg, var(--success-color) 0%, #00C851 100%);
+            color: white;
+        }
+
+        .status-absent {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+            color: white;
+        }
+
+        .status-informed {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);
+            color: white;
+        }
+
+        .status-not-informed {
+            background: linear-gradient(135deg, #795548 0%, #5D4037 100%);
+            color: white;
+        }
+
+        /* Progress Bar */
+        .attendance-progress {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color) 0%, var(--primary-color) 100%);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        .main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        @media (min-width: 992px) {
+            .main-content {
+                margin-left: 240px;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0;
+            }
+            .page-header {
+                padding: 1.5rem;
+                text-align: center;
+            }
+            .trainee-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            .trainee-info h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Hamburger Button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            z-index: 2000;
+            background: var(--primary-color) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white !important;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(151, 71, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: #7c3aed !important;
+            transform: scale(1.05);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* View Toggle Styles */
+        .view-toggle {
+            background: white;
+            border-radius: 15px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: inline-flex;
+            gap: 0.5rem;
+        }
+
+        .toggle-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            background: transparent;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            color: var(--primary-color);
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(151, 71, 255, 0.3);
+        }
+
+        /* Calendar View Styles */
+        .calendar-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: none;
+        }
+
+        .calendar-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .calendar-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+            padding: 1rem;
+        }
+
+        .calendar-day-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .calendar-day {
+            min-height: 120px;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: #f8f9ff;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(135deg, #e8f4ff 0%, #d1e9ff 100%);
+            border: 2px solid var(--primary-color);
+        }
+
+        .calendar-day-number {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .calendar-day.today .calendar-day-number {
+            color: var(--primary-color);
+        }
+
+        .calendar-day-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .calendar-attendance-item {
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .attendance-present {
+            background: linear-gradient(135deg, var(--success-color) 0%, #00C851 100%);
+            color: white;
+        }
+
+        .attendance-absent {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+            color: white;
+        }
+
+        .attendance-informed {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);
+            color: white;
+        }
+
+        .attendance-not-informed {
+            background: linear-gradient(135deg, #795548 0%, #5D4037 100%);
+            color: white;
+        }
+
+        /* Responsive Calendar */
+        @media (max-width: 768px) {
+            .calendar-day {
+                min-height: 80px;
+                padding: 0.5rem;
+            }
+
+            .calendar-day-number {
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .calendar-attendance-item {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Hamburger Button -->
+    <button class="sidebar-toggle d-lg-none" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    {% include 'trainer/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="trainee-avatar">
+                                {{ trainee_info.name|first|upper }}
+                            </div>
+                            <div class="trainee-info">
+                                <h1>{{ trainee_info.name }}</h1>
+                                <div class="subtitle">{{ trainee_info.email }}</div>
+                                <div class="subtitle">{{ trainee_info.course }} - Batch {{ trainee_info.batch }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{% url 'trainer_trainee_attendance' %}" class="back-btn">
+                            <i class="fas fa-arrow-left"></i> Back to Attendance
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="container-fluid p-4">
+            <!-- Hidden div for attendance data -->
+            <div id="attendance-data" style="display: none;">
+                {% for record in attendance_records %}
+                <div data-date="{{ record.date|date:'Y-m-d' }}" data-status="{{ record.status }}" data-remarks="{{ record.remarks|default:'' }}"></div>
+                {% endfor %}
+            </div>
+
+            <!-- View Toggle Buttons -->
+            <div class="d-flex justify-content-center mb-4">
+                <div class="view-toggle">
+                    <button class="toggle-btn active" onclick="switchView('table')">
+                        <i class="fas fa-list"></i> Table View
+                    </button>
+                    <button class="toggle-btn" onclick="switchView('calendar')">
+                        <i class="fas fa-calendar-alt"></i> Calendar View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attendance Progress -->
+            <div class="attendance-progress fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Overall Attendance Rate</h5>
+                    <span class="badge" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; font-size: 1.1rem; padding: 0.5rem 1rem;">
+                        {{ stats.attendance_percentage }}%
+                    </span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ stats.attendance_percentage }}%"></div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-container fade-in">
+                <div class="stat-card stat-present">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.present_days }}</div>
+                    <div class="stat-label">Present Days</div>
+                </div>
+
+                <div class="stat-card stat-absent">
+                    <div class="stat-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.absent_days }}</div>
+                    <div class="stat-label">Absent Days</div>
+                </div>
+
+                <div class="stat-card stat-total">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.total_days }}</div>
+                    <div class="stat-label">Total Days</div>
+                </div>
+
+                <div class="stat-card stat-percentage">
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.attendance_percentage }}%</div>
+                    <div class="stat-label">Attendance Rate</div>
+                </div>
+            </div>
+
+            <!-- Table View (Default) -->
+            <div id="table-view" class="attendance-section fade-in">
+                <div class="section-header">
+                    <i class="fas fa-list me-2"></i>Attendance Records
+                </div>
+                <div class="table-responsive">
+                    <table class="table attendance-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in attendance_records %}
+                            <tr>
+                                <td>
+                                    <strong>{{ record.date|date:"M d, Y" }}</strong>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ record.date|date:"l" }}</span>
+                                </td>
+                                <td>
+                                    {% if record.status == 'present' %}
+                                        <span class="status-badge status-present">
+                                            <i class="fas fa-check-circle"></i> Present
+                                        </span>
+                                    {% elif record.status == 'informed' %}
+                                        <span class="status-badge status-informed">
+                                            <i class="fas fa-info-circle"></i> Informed Absence
+                                        </span>
+                                    {% elif record.status == 'not_informed' %}
+                                        <span class="status-badge status-not-informed">
+                                            <i class="fas fa-exclamation-triangle"></i> Not Informed
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge status-absent">
+                                            <i class="fas fa-times-circle"></i> Absent
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if record.remarks %}
+                                        <em>{{ record.remarks }}</em>
+                                    {% else %}
+                                        <span class="text-muted">No remarks</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <i class="fas fa-calendar-times"></i>
+                                        <h5>No attendance records found</h5>
+                                        <p>This trainee hasn't had any attendance marked yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendar-view" class="calendar-container fade-in">
+                <div class="calendar-header">
+                    <button class="calendar-nav-btn" onclick="previousMonth()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h3 class="calendar-title" id="calendar-month-year">October 2025</h3>
+                    <button class="calendar-nav-btn" onclick="nextMonth()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="calendar-grid">
+                    <!-- Calendar days will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Calendar and View Toggle Functionality
+        let currentDate = new Date();
+        let attendanceData = {};
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            function openSidebar() {
+                sidebar.classList.remove('mobile-hidden');
+                overlay.classList.add('active');
+                toggleBtn.innerHTML = '<i class="fas fa-times"></i>';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.add('mobile-hidden');
+                overlay.classList.remove('active');
+                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+
+            // Toggle sidebar
+            toggleBtn.addEventListener('click', function() {
+                if (sidebar.classList.contains('mobile-hidden')) {
+                    openSidebar();
+                } else {
+                    closeSidebar();
+                }
+            });
+
+            // Close sidebar when clicking overlay
+            overlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar when clicking sidebar links (on mobile)
+            const sidebarLinks = sidebar.querySelectorAll('.nav-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 992) {
+                    // Desktop view - show sidebar, hide overlay and button
+                    sidebar.classList.remove('mobile-hidden');
+                    overlay.classList.remove('active');
+                    toggleBtn.style.display = 'none';
+                } else {
+                    // Mobile view - hide sidebar by default, show button
+                    sidebar.classList.add('mobile-hidden');
+                    toggleBtn.style.display = 'block';
+                }
+            });
+
+            // Initialize based on screen size
+            if (window.innerWidth < 992) {
+                closeSidebar();
+                toggleBtn.style.display = 'block';
+            } else {
+                toggleBtn.style.display = 'none';
+            }
+
+            // Initialize calendar and populate attendance data
+            populateAttendanceData();
+            renderCalendar();
+        });
+
+        // Function to populate attendance data from hidden div
+        function populateAttendanceData() {
+            const dataElements = document.querySelectorAll('#attendance-data > div');
+            dataElements.forEach(element => {
+                const date = element.getAttribute('data-date');
+                const status = element.getAttribute('data-status');
+                const remarks = element.getAttribute('data-remarks');
+                if (date) {
+                    attendanceData[date] = {
+                        status: status,
+                        remarks: remarks
+                    };
+                }
+            });
+        }
+
+        // View switching function
+        function switchView(view) {
+            const tableView = document.getElementById('table-view');
+            const calendarView = document.getElementById('calendar-view');
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+
+            if (view === 'table') {
+                tableView.style.display = 'block';
+                calendarView.style.display = 'none';
+                toggleButtons[0].classList.add('active');
+                toggleButtons[1].classList.remove('active');
+            } else {
+                tableView.style.display = 'none';
+                calendarView.style.display = 'block';
+                toggleButtons[0].classList.remove('active');
+                toggleButtons[1].classList.add('active');
+                renderCalendar();
+            }
+        }
+
+        // Calendar navigation functions
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const calendarGrid = document.querySelector('.calendar-grid');
+            const monthYear = document.getElementById('calendar-month-year');
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+
+            // Update month/year display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            monthYear.textContent = `${monthNames[month]} ${year}`;
+
+            // Clear previous calendar
+            calendarGrid.innerHTML = '';
+
+            // Add day headers
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+
+            // Add empty cells for days before month starts
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+
+                // Check if this is today
+                const today = new Date();
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayElement.classList.add('today');
+                }
+
+                // Create day number
+                const dayNumber = document.createElement('span');
+                dayNumber.className = 'calendar-day-number';
+                dayNumber.textContent = day;
+
+                // Check for attendance data
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const attendance = attendanceData[dateStr];
+
+                if (attendance) {
+                    const attendanceItem = document.createElement('div');
+                    attendanceItem.className = `calendar-attendance-item attendance-${attendance.status}`;
+
+                    let statusText = '';
+                    switch(attendance.status) {
+                        case 'present':
+                            statusText = 'Present';
+                            break;
+                        case 'absent':
+                            statusText = 'Absent';
+                            break;
+                        case 'informed':
+                            statusText = 'Informed';
+                            break;
+                        case 'not_informed':
+                            statusText = 'Not Informed';
+                            break;
+                    }
+
+                    attendanceItem.textContent = statusText;
+                    dayElement.appendChild(attendanceItem);
+                }
+
+                dayElement.insertBefore(dayNumber, dayElement.firstChild);
+                calendarGrid.appendChild(dayElement);
+            }
+
+            // Fill remaining cells to complete the grid
+            const totalCells = calendarGrid.children.length;
+            const remainingCells = 42 - totalCells; // 6 weeks * 7 days
+            for (let i = 0; i < remainingCells && totalCells < 42; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay);
+            }
+        }
+    </script>
+</body>
+</html>

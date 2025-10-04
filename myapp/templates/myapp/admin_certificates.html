@@ -1,0 +1,600 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Management - Admin Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --card-shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 230px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        /* Hero Header */
+        .hero-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-gradient);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Main Content Sections */
+        .content-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-title {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Grade Distribution */
+        .grade-distribution {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .grade-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .grade-letter {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-gradient);
+            margin-bottom: 0.5rem;
+        }
+
+        .grade-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* Course Statistics */
+        .course-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .course-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-code {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .course-cert-count {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--success-gradient);
+        }
+
+        /* Certificate Table */
+        .certificates-table-container {
+            overflow-x: auto;
+        }
+
+        .certificates-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .certificates-table th {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border: none;
+        }
+
+        .certificates-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .certificates-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .course-name {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .certificate-number {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .grade-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .grade-A { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
+        .grade-B { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white; }
+        .grade-C { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; }
+        .grade-D { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); color: white; }
+        .grade-F { background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%); color: white; }
+
+        .status-badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-verified {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        .btn-view {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #a0aec0;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .empty-text {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .hero-header {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .grade-distribution {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .course-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .certificates-table-container {
+                font-size: 0.9rem;
+            }
+
+            .certificates-table th,
+            .certificates-table td {
+                padding: 0.8rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Toggle for Mobile -->
+    <button class="sidebar-toggle d-lg-none" aria-label="Toggle sidebar" style="position:fixed;top:18px;left:18px;z-index:200;background:none;border:none;font-size:2rem;color:#667eea;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="d-flex">
+        {% include 'myapp/_sidebar.html' %}
+
+        <div class="main-content">
+            <!-- Hero Header -->
+            <div class="hero-header">
+                <div class="hero-title">
+                    <i class="fas fa-certificate"></i>
+                    Certificate Management
+                </div>
+                <div class="hero-subtitle">
+                    Monitor and manage all certificates issued across the platform
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--primary-gradient);">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="stat-number">{{ total_certificates }}</div>
+                    <div class="stat-label">Total Certificates</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--success-gradient);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number">{{ verified_certificates }}</div>
+                    <div class="stat-label">Verified</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--warning-gradient);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-number">{{ pending_certificates }}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--secondary-gradient);">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-number">{{ course_stats|length }}</div>
+                    <div class="stat-label">Active Courses</div>
+                </div>
+            </div>
+
+            <!-- Grade Distribution -->
+            <div class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Grade Distribution
+                </div>
+                <div class="grade-distribution">
+                    <div class="grade-card">
+                        <div class="grade-letter">A</div>
+                        <div class="grade-count">{{ grade_distribution.A }}</div>
+                    </div>
+                    <div class="grade-card">
+                        <div class="grade-letter">B</div>
+                        <div class="grade-count">{{ grade_distribution.B }}</div>
+                    </div>
+                    <div class="grade-card">
+                        <div class="grade-letter">C</div>
+                        <div class="grade-count">{{ grade_distribution.C }}</div>
+                    </div>
+                    <div class="grade-card">
+                        <div class="grade-letter">D</div>
+                        <div class="grade-count">{{ grade_distribution.D }}</div>
+                    </div>
+                    <div class="grade-card">
+                        <div class="grade-letter">F</div>
+                        <div class="grade-count">{{ grade_distribution.F }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Statistics -->
+            <div class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-book"></i>
+                    Certificates by Course
+                </div>
+                {% if course_stats %}
+                    <div class="course-stats">
+                        {% for course in course_stats %}
+                        <div class="course-stat-card">
+                            <div class="course-name">{{ course.name }}</div>
+                            <div class="course-code">Code: {{ course.code }}</div>
+                            <div class="course-cert-count">{{ course.count }}</div>
+                            <div style="font-size: 0.9rem; color: #718096;">Certificates Issued</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3 class="empty-title">No Course Data</h3>
+                        <p class="empty-text">No certificates have been issued for any courses yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Certificates -->
+            <div class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-list"></i>
+                    All Certificates
+                </div>
+
+                {% if certificates %}
+                    <div class="certificates-table-container">
+                        <table class="certificates-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Certificate #</th>
+                                    <th>Grade</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Issued Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for certificate in certificates %}
+                                <tr>
+                                    <td>
+                                        <div class="student-name">{{ certificate.trainee.user.get_full_name|default:certificate.trainee.user.username }}</div>
+                                        <div class="course-name">{{ certificate.trainee.course.name|default:"No Course" }}</div>
+                                    </td>
+                                    <td>{{ certificate.course.name }}</td>
+                                    <td>
+                                        <span class="certificate-number">{{ certificate.certificate_number }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="grade-badge grade-{{ certificate.grade }}">{{ certificate.grade }}</span>
+                                    </td>
+                                    <td>{{ certificate.completion_percentage }}%</td>
+                                    <td>
+                                        <span class="status-badge {% if certificate.is_verified %}status-verified{% else %}status-pending{% endif %}">
+                                            {% if certificate.is_verified %}
+                                                <i class="fas fa-check"></i> Verified
+                                            {% else %}
+                                                <i class="fas fa-clock"></i> Pending
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>{{ certificate.issued_date|date:'M d, Y' }}</td>
+                                    <td>
+                                        <a href="#" class="btn-view">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <h3 class="empty-title">No Certificates Yet</h3>
+                        <p class="empty-text">No certificates have been issued in the system yet.</p>
+                        <p class="empty-text">Certificates are automatically generated when students complete courses with 80%+ progress.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (sidebar && toggleBtn) {
+                function closeSidebar() {
+                    sidebar.style.transform = 'translateX(-100%)';
+                }
+
+                function openSidebar() {
+                    sidebar.style.transform = 'translateX(0)';
+                }
+
+                function checkWidth() {
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                        toggleBtn.style.display = 'block';
+                    } else {
+                        sidebar.style.transform = '';
+                        toggleBtn.style.display = 'none';
+                    }
+                }
+
+                checkWidth();
+                toggleBtn.addEventListener('click', function() {
+                    if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)') {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
+                    }
+                });
+                window.addEventListener('resize', checkWidth);
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

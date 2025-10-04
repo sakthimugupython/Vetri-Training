@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Courses - {{ trainee.user.get_full_name|default:trainee.user.username }}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --dark-bg: #2d3748;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            background: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #23243a;
+            color: #fff;
+            min-width: 220px;
+            max-width: 240px;
+            height: 100vh;
+            transition: transform 0.3s;
+            box-shadow: 0 0 16px rgba(56,101,255,0.08);
+            padding-top: 0.5rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0 1.2rem;
+        }
+
+        .sidebar nav .nav-link {
+            color: #fff;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 1rem;
+            margin-bottom: 2px;
+            transition: background 0.2s, font-weight 0.2s;
+            text-decoration: none;
+        }
+
+        .sidebar nav .nav-link.active {
+            background: #9747FF;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(151,71,255,0.12);
+        }
+
+        .sidebar nav .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar nav .nav-link:hover {
+            background: rgba(151, 71, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            padding: 1.5rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Course Cards */
+        .course-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Session Items */
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .session-item:hover {
+            background: #e2e8f0 !important;
+            transform: translateX(2px);
+        }
+
+        /* Top Header Bar */
+        .top-header {
+            background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .page-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-info {
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            margin: 0;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .stats-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #4facfe;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            display: block;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-role {
+            display: block;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb-container {
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb {
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 0;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+
+        .breadcrumb-item {
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item a {
+            color: #4facfe;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-item a:hover {
+            color: #3b82f6;
+        }
+
+        .breadcrumb-item.active {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Quick Actions Bar */
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-action.primary {
+            background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-action.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-action.secondary {
+            background: white;
+            color: #4facfe;
+            border: 2px solid #4facfe;
+            box-shadow: 0 2px 8px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn-action.secondary:hover {
+            background: #4facfe;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-action.tertiary {
+            background: rgba(79, 172, 254, 0.1);
+            color: #4facfe;
+            border: 1px solid rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-action.tertiary:hover {
+            background: rgba(79, 172, 254, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Course Cards */
+        .course-card {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            height: 100%;
+            position: relative;
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .course-card .card-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Enhanced Session Items */
+        .session-item {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid rgba(79, 172, 254, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .session-item:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            border-color: rgba(79, 172, 254, 0.3);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            .header-left {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .page-subtitle {
+                font-size: 1rem;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .btn-action {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            .stats-badge {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <h2 class="logo fw-bold text-white text-center py-4">Vetri <br><span style="font-weight:400;">Training</span></h2>
+        <nav class="flex-grow-1">
+            <a href="{% url 'trainee_dashboard' %}" class="nav-link{% if request.resolver_match.url_name == 'trainee_dashboard' %} active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{% url 'my_courses' %}" class="nav-link{% if request.resolver_match.url_name == 'my_courses' %} active{% endif %}"><i class="fas fa-graduation-cap"></i> My Courses</a>
+            <a href="{% url 'student_certificates' %}" class="nav-link{% if request.resolver_match.url_name == 'student_certificates' %} active{% endif %}"><i class="fas fa-certificate"></i> My Certificates</a>
+            <a href="{% url 'announcements' %}" class="nav-link{% if request.resolver_match.url_name == 'announcements' %} active{% endif %}"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="{% url 'student_logout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header Bar -->
+        <div class="top-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="page-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="page-info">
+                        <h1 class="page-title">My Courses</h1>
+                        <p class="page-subtitle">Manage your enrolled courses and access session recordings</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="stats-badge">
+                        <i class="fas fa-book-open"></i>
+                        <span>{{ total_enrolled_courses }} Course{{ total_enrolled_courses|pluralize }}</span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            {{ trainee.user.first_name.0|default:"U" }}{{ trainee.user.last_name.0|default:"" }}
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">{{ trainee.user.get_full_name|default:trainee.user.username }}</span>
+                            <span class="user-role">{{ trainee.course.name|default:"Student" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="row g-4">
+        {% for course_data in courses_data %}
+        <div class="col-lg-6 col-xl-4">
+            <div class="course-card" style="background: white; border-radius: 25px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); border: none; overflow: hidden; transition: all 0.4s ease; height: 100%; position: relative;">
+                <!-- Course Header -->
+                <div style="background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%); padding: 2rem; color: white; position: relative;">
+                    {% if course_data.course.cover_image %}
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('{{ course_data.course.cover_image.url }}') center/cover; opacity: 0.2;"></div>
+                    {% endif %}
+                    <div style="position: relative; z-index: 2;">
+                        <h5 style="margin: 0 0 0.5rem 0; font-weight: 700; font-size: 1.2rem;">{{ course_data.course.name }}</h5>
+                        <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">
+                            <i class="fas fa-code"></i> {{ course_data.course.category|title }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Course Content -->
+                <div style="padding: 2rem;">
+                    <!-- Course Stats -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--success-color); margin-bottom: 0.3rem;">
+                                {{ course_data.progress_percentage }}%
+                            </div>
+                            <div style="font-size: 0.8rem; color: #718096;">Progress</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.3rem;">
+                                {{ course_data.total_sessions }}
+                            </div>
+                            <div style="font-size: 0.8rem; color: #718096;">Sessions</div>
+                        </div>
+                    </div>
+
+                    <!-- Task Progress -->
+                    {% if course_data.total_tasks > 0 %}
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.9rem; color: #718096;">Task Progress</span>
+                            <span style="font-size: 0.9rem; color: #4facfe; font-weight: 600;">
+                                {{ course_data.completed_tasks }}/{{ course_data.total_tasks }}
+                            </span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                            <div style="width: {{ course_data.progress_percentage }}%; height: 100%; background: linear-gradient(90deg, #4facfe 0%, #10b981 100%); border-radius: 4px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Enrollment Info -->
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #4facfe;">
+                        <div style="font-size: 0.9rem; color: #0277bd; margin-bottom: 0.3rem;">
+                            <i class="fas fa-calendar-plus"></i> Enrolled on
+                        </div>
+                        <div style="font-size: 0.9rem; color: #37474f; font-weight: 600;">
+                            {{ course_data.enrollment_date|date:"M d, Y"|default:"Not available" }}
+                    </div>
+
+                    <!-- Session Recordings -->
+                    <div>
+                        <h6 style="color: #4facfe; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-play-circle"></i> Recent Sessions
+                        {% if course_data.sessions %}
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            {% for session in course_data.sessions %}
+                            <div class="session-item" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s;" onclick="window.open('{{ session.session_url }}', '_blank')">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-weight: 600; font-size: 0.9rem; color: #2d3748; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ session.title }}
+                                    <div style="font-size: 0.8rem; color: #718096; display: flex; align-items: center; gap: 0.5rem;">
+                                        <span><i class="fas fa-user"></i> {{ session.trainer.user.get_full_name|default:session.trainer.user.username }}</span>
+                                        <span><i class="fas fa-calendar"></i> {{ session.upload_date|date:"M/d" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if course_data.total_sessions > 5 %}
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <button style="background: none; border: 1px solid #4facfe; color: #4facfe; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;">
+                                View All {{ course_data.total_sessions }} Sessions
+                            </button>
+                        </div>
+                        {% endif %}
+
+                        {% else %}
+                        <div style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 12px; color: #718096;">
+                            <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <div style="font-size: 0.9rem;">No session recordings yet</div>
+                            <div style="font-size: 0.8rem; margin-top: 0.3rem;">Sessions will appear here once uploaded</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- No Courses Message -->
+        {% if not courses_data %}
+        <div class="col-12">
+            <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+                <i class="fas fa-graduation-cap" style="font-size: 4rem; color: #cbd5e0; margin-bottom: 2rem;"></i>
+                <h3 style="color: #2d3748; margin-bottom: 1rem;">No Courses Enrolled</h3>
+                <p style="color: #718096; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                    You haven't enrolled in any courses yet. Contact your trainer or administrator to get enrolled in a course.
+                </p>
+                <button style="background: var(--primary-color); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s;">
+                    <i class="fas fa-envelope"></i> Contact Trainer
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Course Cards Hover Effect */
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Session Items Hover Effect */
+.session-item:hover {
+    background: #e2e8f0 !important;
+    transform: translateX(2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .course-card {
+        margin-bottom: 2rem;
+    }
+}
+</style>
+
+<script>
+    // Sidebar toggle function
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('active');
+        }
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle');
+
+        if (window.innerWidth <= 768 &&
+            !sidebar.contains(event.target) &&
+            !toggleBtn.contains(event.target) &&
+            sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const sidebar = document.querySelector('.sidebar');
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('active');
+        }
+    });
+
+    // Add any interactive functionality here if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Courses page loaded successfully');
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+/* Glassmorphism effect for login options - two panel UI */
+body {
+	min-height: 100vh;
+	background: linear-gradient(120deg, #52fe97 0%, #3865ff 100%);
+	background-repeat: no-repeat;
+}
+.login-glass-bg {
+	background: none;
+}
+.login-glass-main {
+	width: 700px;
+	min-height: 380px;
+	border-radius: 24px;
+	background: rgba(255,255,255,0.18);
+	box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+	backdrop-filter: blur(18px);
+	-webkit-backdrop-filter: blur(18px);
+	border: 1.5px solid rgba(255,255,255,0.28);
+	overflow: hidden;
+}
+.glass-welcome {
+	background: linear-gradient(135deg, #52fe97 0%, #3865ff 100%);
+	border-top-left-radius: 24px;
+	border-bottom-left-radius: 24px;
+	min-height: 380px;
+}
+.glass-login-panel {
+	background: rgba(255,255,255,0.45);
+	border-top-right-radius: 24px;
+	border-bottom-right-radius: 24px;
+	min-height: 380px;
+	box-shadow: 0 4px 24px 0 rgba(31,38,135,0.10);
+}
+.glass-btn2 {
+	background: #3865ff;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-size: 17px;
+	font-weight: 600;
+	margin-bottom: 14px;
+	padding: 12px 0;
+	box-shadow: 0 2px 8px rgba(56,101,255,0.12);
+	transition: background 0.2s, box-shadow 0.2s;
+}
+.glass-btn2:hover {
+	background: #2650c4;
+	color: #fff;
+	box-shadow: 0 4px 16px rgba(56,101,255,0.18);
+}
+@media (max-width: 900px) {
+	.login-glass-main { width: 98vw; }
+}
+@media (max-width: 600px) {
+	.login-glass-main { flex-direction: column; width: 100vw; min-height: unset; }
+	.glass-welcome, .glass-login-panel { border-radius: 0 !important; min-height: 220px; }
+}

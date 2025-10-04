@@ -1,0 +1,19 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+<h2>Update Attendance for {{ trainee.user.get_full_name|default:trainee.user.username }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label>Status:</label>
+        <select name="status" class="form-control">
+            <option value="present" {% if attendance.status == 'present' %}selected{% endif %}>Present</option>
+            <option value="absent" {% if attendance.status == 'absent' %}selected{% endif %}>Absent</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Remarks:</label>
+        <input type="text" name="remarks" class="form-control" value="{{ attendance.remarks }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Update Attendance</button>
+</form>
+{% endblock %}

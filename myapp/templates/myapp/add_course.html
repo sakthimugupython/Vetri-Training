@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/course_list.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { background: #f4f6ff; }
+        .add-course-container {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(56,101,255,0.08);
+            padding: 32px 32px 24px 32px;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        .add-course-title {
+            color: #9747FF;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+        .upload-cover {
+            background: #f4f6ff;
+            border: 2px dashed #9747FF;
+            border-radius: 12px;
+            text-align: center;
+            padding: 32px 0;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .upload-cover input[type=file] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0; top: 0;
+            cursor: pointer;
+        }
+        .upload-cover-label {
+            color: #9747FF;
+            font-weight: 600;
+            font-size: 1.1rem;
+            pointer-events: none;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #222e3a;
+        }
+        .form-control, .form-select {
+            background: #f4f6ff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #222e3a;
+        }
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 2px #9747FF33;
+            border: none;
+        }
+        .add-btn {
+            background: linear-gradient(180deg, #00EA5E 0%, #04682D 100%);
+            color: #fff;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-size: 1.1rem;
+            margin-top: 18px;
+        }
+        .add-btn:hover {
+            filter: brightness(1.08);
+        }
+    </style>
+</head>
+<body>
+    {% include 'myapp/_sidebar.html' %}
+    <div class="main-content" style="margin-left:240px;">
+        <div class="course-header" style="background:#3865ff;color:#fff;border-radius:0 0 6px 6px;padding:22px 32px 18px 32px;margin-bottom:18px;">
+            <div>
+                <h3 class="course-title">Courses</h3>
+                <div class="course-subtitle">Add, update, and manage all courses.</div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <button class="icon-btn"><i class="fas fa-search"></i></button>
+                <button class="icon-btn"><i class="fas fa-envelope"></i></button>
+                <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                <div class="user-info ms-2">
+                    <div class="user-role">VTS Admin</div>
+                </div>
+            </div>
+        </div>
+        <div class="add-course-title">Add New Course</div>
+        <div class="add-course-container">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="upload-cover mb-4">
+                    <span class="upload-cover-label">Upload Course Cover Page Here</span>
+                    <input type="file" name="cover_image" accept="image/*">
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Course Title</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Course Code</label>
+                        <input type="text" name="code" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Trainer Assignment</label>
+                        <select name="trainer" class="form-select" required>
+                            <option value="">Select Trainer</option>
+                            {% for trainer in trainers %}
+                                <option value="{{ trainer.id }}">{{ trainer.user.get_full_name|default:trainer.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Duration</label>
+                        <input type="text" name="duration" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Mode</label>
+                        <select name="mode" class="form-select" required>
+                            <option value="offline">Offline</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select" required>
+                            <option value="developer">Developer</option>
+                            <option value="designer">Designer</option>
+                            <option value="tester">Tester</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Course Description</label>
+                        <textarea name="description" class="form-control" rows="2" required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Upload Syllabus</label>
+                        <input type="file" name="syllabus" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Add learning outcomes</label>
+                        <input type="text" name="learning_outcomes" class="form-control">
+                    </div>
+                </div>
+                <button type="submit" class="add-btn">Add New Course</button>
+            </form>
+        </div>
+    </div>
+    {% include 'myapp/includes/course_success_popup.html' %}
+</body>
+</html>

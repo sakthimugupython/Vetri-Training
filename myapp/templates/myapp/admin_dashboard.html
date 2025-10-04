@@ -1,0 +1,388 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Chart.js and plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+</head>
+<body>
+    <button class="sidebar-toggle d-lg-none" aria-label="Toggle sidebar" style="position:fixed;top:18px;left:18px;z-index:200;background:none;border:none;font-size:2rem;color:#9747FF;">
+        <i class="fas fa-bars"></i>
+    </button>
+    {% include 'myapp/_sidebar.html' %}
+    <div class="main-content">
+    <div class="topbar d-flex justify-content-between align-items-center flex-lg-row flex-column gap-2">
+    <script>
+    // Hamburger sidebar toggle for mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle');
+        function closeSidebar() {
+            sidebar.style.transform = 'translateX(-100%)';
+        }
+        function openSidebar() {
+            sidebar.style.transform = 'translateX(0)';
+        }
+        if (window.innerWidth < 992) {
+            closeSidebar();
+        }
+        toggleBtn.addEventListener('click', function() {
+            if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)') {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 992) {
+                closeSidebar();
+            } else {
+                sidebar.style.transform = '';
+            }
+        });
+    });
+    </script>
+            <h1 class="dashboard-title">Admin Dashboard <br> <small class="fs-6">Welcome back, Here's an overview of your platform activities and key metrics.</small></h1>
+            
+            <div class="d-flex align-items-center">
+                <input type="text" class="search-box me-2" placeholder="Search...">
+                <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                <button class="icon-btn"><i class="fas fa-envelope"></i></button>
+                <div class="user-info ms-3">
+                    <span class="badge bg-info">VTS Admin</span>
+                </div>
+            </div>
+        </div>
+        <div class="summary-cards">
+            <div class="summary-card text-center">
+                <div class="icon"><i class="fas fa-user-graduate"></i></div>
+                <h5 class="label">Total Trainees</h5>
+                <h3 class="value">{{ total_trainees }}</h3>
+            </div>
+            <div class="summary-card text-center">
+                <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                <h5 class="label">Total Trainers</h5>
+                <h3 class="value">{{ total_trainers }}</h3>
+            </div>
+            <div class="summary-card text-center">
+                <div class="icon"><i class="fas fa-book"></i></div>
+                <h5 class="label">Active Courses</h5>
+                <h3 class="value">{{ total_courses }}</h3>
+            </div>
+            <div class="summary-card text-center">
+                <div class="icon"><i class="fas fa-trophy"></i></div>
+                <h5 class="label">Certificates Issued</h5>
+                <h3 class="value">{{ total_certificates }}</h3>
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-lg-7">
+                <div class="dashboard-section mb-3 trainee-activity-section">
+                    <h5 class="mb-3" style="color:#5a3cff;font-weight:600;">Trainee Activity</h5>
+                    <div class="table-responsive">
+                        <table class="table trainee-activity-table mb-0">
+                            <thead style="border-color: #9747FF;">
+                                <tr class="training-activity-head">
+                                    <th>S.no</th>
+                                    <th>Trainee Name</th>
+                                    <th>Last Login</th>
+                                    <th>Current Course</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background:#f3f3ff; border-color: #9747FF;">
+                                {% for t in trainee_activity %}
+                                <tr>
+                                    <td>{{ t.sno }}</td>
+                                    <td>{{ t.name }}</td>
+                                    <td>{{ t.last_login }}</td>
+                                    <td>{{ t.course }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center">No trainee activity found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-2" style="border-bottom-left-radius:8px;border-bottom-right-radius:8px;">
+                        <a href="{% url 'trainee_list' %}" class="dashboard-link" style="color:#00c853;font-weight:500;display:inline-flex;align-items:center;gap:6px;">
+                            <span style="font-size:1.2em;">&#8594;</span> View All Trainees
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="dashboard-section mb-3">
+                    <h5 style="color:#9747FF;font-size:1.15rem;font-weight:600;display:flex;align-items:center;gap:0.5rem;">
+                        Trainee Distribution by Course 
+                        <i class="fas fa-info-circle" style="color:#b8b9ce;font-size:0.9rem;" data-bs-toggle="tooltip" title="Shows the number of trainees enrolled in each course"></i>
+                    </h5>
+                    <div style="height:280px;position:relative;padding:10px 0;">
+                        <canvas id="pieChart" class="pie-chart"></canvas>
+                    </div>
+                    <script>
+                        // Single Pie Chart for Trainee Distribution by Course
+                        document.addEventListener('DOMContentLoaded', function() {
+                            try {
+                                const pieChartCtx = document.getElementById('pieChart').getContext('2d');
+                                const labels = JSON.parse('{{ course_labels|escapejs }}');
+                                const data = JSON.parse('{{ course_counts|escapejs }}');
+                                
+                                console.log('Chart data:', { labels, data });
+
+                                const colors = [
+                                    '#3865ff', '#19c37d', '#9747FF', '#ff6384', '#ffb347',
+                                    '#5f6ef7', '#52fe97', '#7498FE', '#B27AFF', '#00c853'
+                                ];
+
+                                new Chart(pieChartCtx, {
+                                    type: 'pie',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [{
+                                            data: data,
+                                            backgroundColor: colors.slice(0, labels.length),
+                                            borderWidth: 0
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        layout: {
+                                            padding: {
+                                                right: 20,
+                                                left: 20
+                                            }
+                                        },
+                                        plugins: {
+                                            legend: {
+                                                position: 'right',
+                                                labels: {
+                                                    boxWidth: 15,
+                                                    padding: 15,
+                                                    font: { size: 12 }
+                                                }
+                                            },
+                                            datalabels: {
+                                                color: '#fff',
+                                                font: { weight: 'bold', size: 12 },
+                                                formatter: function(value, ctx) {
+                                                    const total = data.reduce((a, b) => a + b, 0);
+                                                    const percent = ((value / total) * 100).toFixed(1);
+                                                    return `${value}\n(${percent}%)`;
+                                                }
+                                            },
+                                            tooltip: {
+                                                callbacks: {
+                                                    label: function(ctx) {
+                                                        const total = data.reduce((a, b) => a + b, 0);
+                                                        const value = ctx.raw;
+                                                        const percent = ((value / total) * 100).toFixed(1);
+                                                        return `${ctx.label}: ${value} trainees (${percent}%)`;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            } catch (error) {
+                                console.error('Error creating pie chart:', error);
+                                const ctx = document.getElementById('pieChart').getContext('2d');
+                                ctx.font = '14px Arial';
+                                ctx.fillStyle = '#666';
+                                ctx.textAlign = 'center';
+                                ctx.fillText('No course data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                            }
+                            const pieCtx = document.getElementById('pieChart').getContext('2d');
+                            const courseLabels = JSON.parse(document.getElementById('courseLabels').textContent);
+                            const courseCounts = JSON.parse(document.getElementById('courseCounts').textContent);
+                            const total = courseCounts.reduce((a, b) => a + b, 0);
+                            
+                            if (!total) {
+                                // If no data, show a message on the canvas
+                                const ctx = pieCtx;
+                                ctx.font = '14px Arial';
+                                ctx.fillStyle = '#666';
+                                ctx.textAlign = 'center';
+                                ctx.fillText('No trainee data available', pieCtx.canvas.width / 2, pieCtx.canvas.height / 2);
+                                return;
+                            }
+                            
+                            const colors = [
+                                '#3865ff', '#19c37d', '#9747FF', '#ff6384', '#ffb347',
+                                '#5f6ef7', '#52fe97', '#7498FE', '#B27AFF', '#00c853'
+                            ];
+                            
+                            const chart = new Chart(pieCtx, {
+                                type: 'pie',
+                                data: {
+                                    labels: courseLabels,
+                                    datasets: [{
+                                        data: courseCounts,
+                                        backgroundColor: colors.slice(0, courseLabels.length),
+                                        borderWidth: 0
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'right',
+                                            labels: {
+                                                boxWidth: 15,
+                                                padding: 15,
+                                                font: {
+                                                    size: 12
+                                                }
+                                            }
+                                        },
+                                        datalabels: {
+                                            color: '#fff',
+                                            font: {
+                                                weight: 'bold',
+                                                size: 12
+                                            },
+                                            formatter: function(value, context) {
+                                                if (total === 0) return '';
+                                                const percent = (value / total * 100).toFixed(1);
+                                                return value + '\n(' + percent + '%)';
+                                            },
+                                            textAlign: 'center'
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const value = context.raw;
+                                                    const percent = ((value / total) * 100).toFixed(1);
+                                                    return `${context.label}: ${value} trainees (${percent}%)`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            
+                            // Add padding to the container for better legend display
+                            chart.canvas.parentNode.style.padding = '20px';
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="dashboard-section">
+                    <h6>Upcoming Exams</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li>UIUX Module Evaluation <span class="text-muted small">Scheduled: 10/08/2025</span></li>
+                        <li>Design Principles Test <span class="text-muted small">Scheduled: 12/08/2025</span></li>
+                        <li>UX Case Study Review <span class="text-muted small">Scheduled: 15/08/2025</span></li>
+                    </ul>
+                    <div class="text-end mt-2">
+                        <a href="#" class="dashboard-link">View All Exams <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-section">
+                    <h6>Exams Awaiting Review</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li>Typography Quiz <span class="text-muted small">Submitted: 03/08/2025</span></li>
+                        <li>Color Theory Assign <span class="text-muted small">Submitted: 04/08/2025</span></li>
+                        <li>Python Coding <span class="text-muted small">Submitted: 03/08/2025</span></li>
+                    </ul>
+                    <div class="text-end mt-2">
+                        <a href="#" class="dashboard-link">Review Now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-section">
+                    <h6>Recently Issued Certificates</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li>UI/UX Design Basics <span class="text-muted small">Issued: 01/08/2025</span></li>
+                        <li>Figma Prototyping <span class="text-muted small">Issued: 26/07/2025</span></li>
+                        <li>UX Case Study <span class="text-muted small">Issued: 28/07/2025</span></li>
+                    </ul>
+                    <div class="text-end mt-2">
+                        <a href="#" class="dashboard-link">Download Certificates <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="dashboard-section">
+                    <h6>Trainer Insights</h6>
+                    <canvas id="barChart" class="bar-chart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="dashboard-section announcements">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Latest Announcements</h6>
+                        <a href="{% url 'add_announcement' %}" class="btn btn-sm" style="background:#19c37d;color:white;font-weight:500;">Add New</a>
+                    </div>
+                    {% for announcement in latest_announcements %}
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="fw-bold mb-0">{{ announcement.title }}</h6>
+                            <p class="text-muted small mb-0">{{ announcement.short_description }}</p>
+                            <div class="text-muted small mt-1">
+                                {% if announcement.target_audience == 'all' %}
+                                <span class="badge" style="background:#3865ff">All</span>
+                                {% elif announcement.target_audience == 'trainers' %}
+                                <span class="badge" style="background:#52fe97">Trainers</span>
+                                {% else %}
+                                <span class="badge" style="background:#ffb347">Trainees</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small">{{ announcement.date_posted|date:"M d, Y" }}</div>
+                            <a href="#" class="btn btn-sm btn-light mt-1">Edit</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-3">
+                        <p class="text-muted mb-0">No announcements yet</p>
+                        <a href="{% url 'add_announcement' %}" class="btn btn-sm btn-success mt-2">Create First Announcement</a>
+                    </div>
+                    {% endfor %}
+                    {% if latest_announcements %}
+                    <div class="text-end mt-3">
+                        <a href="{% url 'announcements' %}" class="dashboard-link" style="color:#00c853;font-weight:500;display:inline-flex;align-items:center;gap:6px;">
+                            View All Announcements <span style="font-size:1.2em;">→</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Bar Chart for Trainer Insights
+        const barChartCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Number of New Trainers',
+                    data: [2, 3, 5, 4, 2, 3, 6],
+                    backgroundColor: '#3865ff',
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
+        });
+    </script>
+</body>
+</html>

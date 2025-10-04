@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/course_list.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="main-content" style="max-width:800px;margin:40px auto;">
+        <h3 style="color:#9747FF;font-weight:700;margin-bottom:24px;">Edit Course</h3>
+        <form method="post" enctype="multipart/form-data" class="add-course-form" autocomplete="off">
+            {% csrf_token %}
+            <div class="mb-3 text-center">
+                {% if course.cover_image %}
+                    <img src="{{ course.cover_image.url }}" alt="Course Cover" style="width:180px;height:100px;border-radius:12px;object-fit:cover;">
+                {% else %}
+                    <img src="{% static 'myapp/img/default-course.jpg' %}" alt="Course Cover" style="width:180px;height:100px;border-radius:12px;object-fit:cover;">
+                {% endif %}
+                <div style="margin-top:10px;">
+                    <label class="form-label">Change Cover Image</label>
+                    <input type="file" class="form-control" name="cover_image" accept="image/*">
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Course Title</label>
+                    <input type="text" name="name" class="form-control" value="{{ course.name }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Course Code</label>
+                    <input type="text" name="code" class="form-control" value="{{ course.code }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Trainer Assignment</label>
+                    <select name="trainer" class="form-select" required>
+                        <option value="">Select Trainer</option>
+                        {% for trainer in trainers %}
+                            <option value="{{ trainer.id }}" {% if course.trainer and course.trainer.id == trainer.id %}selected{% endif %}>{{ trainer.user.get_full_name|default:trainer.user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Duration</label>
+                    <input type="text" name="duration" class="form-control" value="{{ course.duration }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Mode</label>
+                    <select name="mode" class="form-select" required>
+                        <option value="offline" {% if course.mode == 'offline' %}selected{% endif %}>Offline</option>
+                        <option value="online" {% if course.mode == 'online' %}selected{% endif %}>Online</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select" required>
+                        <option value="developer" {% if course.category == 'developer' %}selected{% endif %}>Developer</option>
+                        <option value="designer" {% if course.category == 'designer' %}selected{% endif %}>Designer</option>
+                        <option value="tester" {% if course.category == 'tester' %}selected{% endif %}>Tester</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Course Description</label>
+                <textarea name="description" class="form-control" rows="2" required>{{ course.description }}</textarea>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Upload Syllabus</label>
+                    <input type="file" name="syllabus" class="form-control">
+                    {% if course.syllabus %}
+                        <a href="{{ course.syllabus.url }}" target="_blank">View Current Syllabus</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Add learning outcomes</label>
+                    <input type="text" name="learning_outcomes" class="form-control" value="{{ course.learning_outcomes }}">
+                </div>
+            </div>
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <a href="{% url 'course_list' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

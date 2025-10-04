@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Trainee</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainee_list.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    {% include 'myapp/_sidebar.html' %}
+    <div class="main-content">
+        <div class="trainee-header" style="background:#3865ff;color:#fff;padding:14px 32px 18px 32px;">
+            <h3 class="mb-1" style="font-weight:700;">Add New Trainee</h3>
+        </div>
+        <div class="card p-4" style="max-width:600px;margin:0 auto;box-shadow:0 2px 12px #0001;border-radius:16px;">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="trainee_code" class="form-label">Trainee ID</label>
+                    <input type="text" class="form-control" id="trainee_code" name="trainee_code" required>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" id="phone" name="phone" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="course" class="form-label">Course Enrolled</label>
+                    <select class="form-select" id="course" name="course" required>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="Active">Active</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="trainer" class="form-label">Trainer Assigned</label>
+                    <select class="form-select" id="trainer" name="trainer" required>
+                        <option value="">-- Select Trainer --</option>
+                        {% for trainer in trainers %}
+                        <option value="{{ trainer.id }}">{{ trainer.user.get_full_name|default:trainer.user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="batch" class="form-label">Batch</label>
+                    <select class="form-select" id="batch" name="batch" required>
+                        <option value="">-- Select Batch --</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="progress" class="form-label">Progress (%)</label>
+                    <input type="number" class="form-control" id="progress" name="progress" min="0" max="100" required>
+                </div>
+                <div class="mb-3">
+                    <label for="profile_image" class="form-label">Profile Picture</label>
+                    <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'trainee_list' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">Add Trainee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% include 'myapp/includes/trainee_success_popup.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Trainer batch data from backend
+    const trainerData = JSON.parse('{{ trainer_data_json|escapejs }}');
+        const trainerSelect = document.getElementById('trainer');
+        const batchSelect = document.getElementById('batch');
+
+        function updateBatchOptions() {
+            const trainerId = trainerSelect.value;
+            batchSelect.innerHTML = '<option value="">-- Select Batch --</option>';
+            if (!trainerId) return;
+            const trainer = trainerData.find(t => t.id == parseInt(trainerId));
+            if (trainer) {
+                for (let i = 1; i <= trainer.batches; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = i;
+                    batchSelect.appendChild(opt);
+                }
+            }
+        }
+        trainerSelect.addEventListener('change', updateBatchOptions);
+        document.addEventListener('DOMContentLoaded', updateBatchOptions);
+    </script>
+</body>
+</html>

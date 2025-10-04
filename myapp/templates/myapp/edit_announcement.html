@@ -1,0 +1,445 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Announcement - Admin Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --card-shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 230px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        /* Hero Header */
+        .hero-header {
+            background: var(--warning-gradient);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Form Styling */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+            background: white;
+        }
+
+        .form-control::placeholder {
+            color: #a0aec0;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-update {
+            background: var(--success-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-cancel:hover {
+            background: #cbd5e0;
+            color: #2d3748;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        /* Current Info */
+        .current-info {
+            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+            border: 1px solid #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-title {
+            color: #2d3748;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-label {
+            color: #718096;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .hero-header {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .form-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Toggle for Mobile -->
+    <button class="sidebar-toggle d-lg-none" aria-label="Toggle sidebar" style="position:fixed;top:18px;left:18px;z-index:200;background:none;border:none;font-size:2rem;color:#f59e0b;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="d-flex">
+        {% include 'myapp/_sidebar.html' %}
+
+        <div class="main-content w-100">
+            <!-- Hero Header -->
+            <div class="hero-header">
+                <div class="hero-title">
+                    <i class="fas fa-edit"></i>
+                    Edit Announcement
+                </div>
+                <div class="hero-subtitle">
+                    Modify the details of your existing announcement
+                </div>
+            </div>
+
+            <!-- Current Information -->
+            <div class="current-info">
+                <div class="info-title">
+                    <i class="fas fa-info-circle"></i>
+                    Current Announcement Details
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Title</div>
+                        <div class="info-value">{{ announcement.title }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Posted By</div>
+                        <div class="info-value">{{ announcement.posted_by }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Post Date</div>
+                        <div class="info-value">{{ announcement.date_posted|date:'M d, Y' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Target Audience</div>
+                        <div class="info-value">{{ announcement.get_target_audience_display }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="form-container">
+                <div class="form-title">
+                    <i class="fas fa-edit"></i>
+                    Update Announcement Details
+                </div>
+                <div class="form-subtitle">
+                    Make changes to your announcement below. All fields are editable.
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-heading"></i>
+                                Announcement Title
+                            </label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                   value="{{ announcement.title }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left"></i>
+                                Short Description
+                            </label>
+                            <input type="text" class="form-control" id="description" name="description"
+                                   value="{{ announcement.short_description|default:'' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="target_audience" class="form-label">
+                                <i class="fas fa-users"></i>
+                                Target Audience
+                            </label>
+                            <select class="form-select" id="target_audience" name="target_audience" required>
+                                <option value="all" {% if announcement.target_audience == 'all' %}selected{% endif %}>All Users</option>
+                                <option value="trainers" {% if announcement.target_audience == 'trainers' %}selected{% endif %}>Trainers Only</option>
+                                <option value="trainees" {% if announcement.target_audience == 'trainees' %}selected{% endif %}>Trainees Only</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="post_date" class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                Post Date
+                            </label>
+                            <input type="date" class="form-control" id="post_date" name="post_date"
+                                   value="{{ announcement.date_posted|date:'Y-m-d' }}" required>
+                        </div>
+
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="content" class="form-label">
+                                <i class="fas fa-edit"></i>
+                                Full Message
+                            </label>
+                            <textarea class="form-control" id="content" name="content" rows="6" required>{{ announcement.content }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <a href="{% url 'announcements' %}" class="btn-cancel">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn-update">
+                            <i class="fas fa-save"></i>
+                            Update Announcement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (sidebar && toggleBtn) {
+                function closeSidebar() {
+                    sidebar.style.transform = 'translateX(-100%)';
+                }
+
+                function openSidebar() {
+                    sidebar.style.transform = 'translateX(0)';
+                }
+
+                function checkWidth() {
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                        toggleBtn.style.display = 'block';
+                    } else {
+                        sidebar.style.transform = '';
+                        toggleBtn.style.display = 'none';
+                    }
+                }
+
+                checkWidth();
+                toggleBtn.addEventListener('click', function() {
+                    if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)') {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
+                    }
+                });
+                window.addEventListener('resize', checkWidth);
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

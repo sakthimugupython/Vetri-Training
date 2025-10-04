@@ -1,0 +1,304 @@
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #00EA5E;
+    --danger-color: #ff3b3b;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+/* Sidebar and Layout */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 220px;
+    background: #212529;
+    color: #fff;
+    padding-top: 60px;
+    z-index: 1000;
+}
+.sidebar .nav-link {
+    color: #adb5bd;
+    font-weight: 500;
+    padding: 15px 25px;
+    border-radius: 0 30px 30px 0;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s, color 0.2s;
+}
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: #0d6efd;
+    color: #fff;
+}
+.sidebar .sidebar-header {
+    font-size: 1.3rem;
+    font-weight: bold;
+    padding: 0 25px 20px 25px;
+    color: #fff;
+}
+.main-content {
+    margin-left: 220px;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+/* Top Header */
+.top-header {
+    background: #3B82F6 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 18px 40px 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+.top-header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.top-header .user-info img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0d6efd;
+}
+
+.stats-row {
+    margin-bottom: 30px;
+}
+.stats-card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s;
+    background: linear-gradient(180deg, #934CD2 0%, #9298F1 100%) !important;
+    min-width: 180px;
+    min-height: 120px;
+    color: #fff;
+}
+.stats-card .fa-2x {
+    font-size: 2rem;
+    color: #fff !important;
+}
+.stats-card .card-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #fff !important;
+}
+.stats-card .card-text {
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #fff !important;
+}
+
+.course-stats {
+    height: 320px;
+    margin-top: 2rem;
+}
+
+.trainee-table {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.trainee-table th {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.status-active {
+    color: var(--success-color);
+}
+
+.status-inactive {
+    color: var(--danger-color);
+}
+
+.course-list {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.course-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.course-item:last-child {
+    border-bottom: none;
+}
+
+.trainee-count {
+    background-color: #e9ecef;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+.profile-header {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-pills .nav-link {
+    color: #6c757d;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Enhanced Card Styles for Dashboard Sections */
+.card-section {
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(147, 76, 210, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+    padding: 32px 28px 28px 28px;
+    margin-bottom: 32px;
+    border: 1.5px solid #e5e7eb;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.card-section:hover {
+    box-shadow: 0 12px 32px rgba(147, 76, 210, 0.18), 0 2px 8px rgba(0,0,0,0.08);
+    transform: translateY(-2px) scale(1.01);
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #934CD2;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+}
+
+/* Table Styling */
+.card-table table {
+    background: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.card-table th {
+    background: #f3f4f6;
+    color: #934CD2;
+    font-weight: 600;
+    border: none;
+    font-size: 1.05rem;
+}
+.card-table td {
+    border-top: 1px solid #e5e7eb;
+    font-size: 1.01rem;
+    vertical-align: middle;
+}
+.card-table tr:hover {
+    background: #f8f5fc;
+    transition: background 0.2s;
+}
+
+/* Chart Container */
+.chart-container {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+    border-radius: 18px;
+    box-shadow: 0 2px 8px rgba(147, 76, 210, 0.08);
+    padding: 32px 18px 18px 18px;
+    margin-bottom: 0;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Recent Trainees Table */
+.recent-trainees-table th {
+    background: #f3f4f6;
+    color: #934CD2;
+    font-weight: 600;
+    border: none;
+    font-size: 1.05rem;
+}
+.recent-trainees-table td {
+    border-top: 1px solid #e5e7eb;
+    font-size: 1.01rem;
+    vertical-align: middle;
+}
+.recent-trainees-table tr:hover {
+    background: #f8f5fc;
+    transition: background 0.2s;
+}
+
+/* Toggle Switch for Status */
+.status-toggle {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    vertical-align: middle;
+}
+.status-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.status-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #e5e7eb;
+    border-radius: 26px;
+    transition: background 0.2s;
+}
+.status-toggle input:checked + .status-slider {
+    background: #22c55e;
+}
+.status-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
+.status-toggle input:checked + .status-slider:before {
+    transform: translateX(22px);
+}
+.status-label {
+    margin-left: 12px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+.status-label.offline {
+    color: #e5e7eb;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 991px) {
+    .main-content { margin-left: 0; }
+    .sidebar { position: static; width: 100%; height: auto; }
+    .card-section, .chart-container { padding: 18px 8px; }
+}

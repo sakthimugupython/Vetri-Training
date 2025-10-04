@@ -1,0 +1,377 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ session.title }} - Session Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainer_dashboard.css' %}">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #934CD2 0%, #3B82F6 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #00EA5E 0%, #00C851 100%);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .session-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 50px;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 8px 25px rgba(147, 76, 210, 0.3);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .session-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .session-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .session-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .session-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .meta-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .meta-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+
+        .meta-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .session-description {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #934CD2;
+            margin-bottom: 25px;
+        }
+
+        .session-description h5 {
+            color: #934CD2;
+            margin-bottom: 15px;
+        }
+
+        .video-container {
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .session-actions {
+            text-align: center;
+        }
+
+        .visibility-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .visibility-show {
+            background: var(--success-gradient);
+        }
+
+        .visibility-hide {
+            background: var(--warning-gradient);
+        }
+
+        .visibility-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .related-sessions {
+            margin-top: 40px;
+        }
+
+        .related-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .related-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .related-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .related-meta {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .status-failed {
+            background: linear-gradient(135deg, #FF5252 0%, #E53935 100%);
+            color: white;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    {% include 'trainer/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid py-4">
+            <!-- Header Section -->
+            <div class="session-header">
+                <div class="position-relative">
+                    <span class="status-badge {% if session.upload_status == 'success' %}status-success{% elif session.upload_status == 'failed' %}status-failed{% else %}status-pending{% endif %}">
+                        {% if session.upload_status == 'success' %}
+                            <i class="fas fa-check-circle me-1"></i>Success
+                        {% elif session.upload_status == 'failed' %}
+                            <i class="fas fa-times-circle me-1"></i>Failed
+                        {% else %}
+                            <i class="fas fa-clock me-1"></i>Pending
+                        {% endif %}
+                    </span>
+                    <h2><i class="fas fa-video me-3"></i>{{ session.title }}</h2>
+                    <p>Session Dashboard - Batch {{ session.batch }}</p>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <!-- Main Session Details -->
+                    <div class="col-lg-8">
+                        <div class="session-card">
+                            <h3 class="session-title">
+                                <i class="fas fa-info-circle me-2 text-primary"></i>
+                                Session Information
+                            </h3>
+
+                            <!-- Session Metadata -->
+                            <div class="session-meta">
+                                <div class="meta-item">
+                                    <div class="meta-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="meta-label">Target Batch:</div>
+                                    <div class="meta-value">Batch {{ session.batch }}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-icon">
+                                        <i class="fas fa-calendar"></i>
+                                    </div>
+                                    <div class="meta-label">Upload Date:</div>
+                                    <div class="meta-value">{{ session.upload_date|date:"F d, Y \a\t h:i A" }}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-icon">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <div class="meta-label">Uploaded By:</div>
+                                    <div class="meta-value">{{ session.trainer.user.get_full_name|default:session.trainer.user.username }}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-icon">
+                                        <i class="fas fa-link"></i>
+                                    </div>
+                                    <div class="meta-label">Session URL:</div>
+                                    <div class="meta-value">
+                                        <a href="{{ session.session_url }}" target="_blank" class="text-decoration-none">
+                                            {{ session.session_url|truncatechars:50 }}
+                                            <i class="fas fa-external-link-alt ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Session Description -->
+                            {% if session.description %}
+                            <div class="session-description">
+                                <h5><i class="fas fa-align-left me-2"></i>Description</h5>
+                                <p>{{ session.description }}</p>
+                            </div>
+                            {% endif %}
+
+                            <!-- Session Actions -->
+                            <div class="session-actions">
+                                <h5 class="mb-3">Session Actions</h5>
+                                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                                    <a href="{{ session.session_url }}" target="_blank" class="action-btn">
+                                        <i class="fas fa-play"></i>
+                                        Watch Session
+                                    </a>
+                                    <a href="{% url 'session_list' %}" class="action-btn">
+                                        <i class="fas fa-arrow-left"></i>
+                                        Back to Sessions
+                                    </a>
+                                    <form method="post" action="{% url 'toggle_session_visibility' session.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-btn visibility-btn {% if session.is_visible %}visibility-hide{% else %}visibility-show{% endif %}">
+                                            {% if session.is_visible %}
+                                                <i class="fas fa-eye-slash"></i>
+                                                Hide from Trainees
+                                            {% else %}
+                                                <i class="fas fa-eye"></i>
+                                                Show to Trainees
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'delete_session' session.id %}" class="action-btn" onclick="return confirm('Are you sure you want to delete this session? This action cannot be undone.')">
+                                        <i class="fas fa-trash"></i>
+                                        Delete Session
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related Sessions Sidebar -->
+                    <div class="col-lg-4">
+                        {% if related_sessions %}
+                        <div class="related-sessions">
+                            <h4 class="mb-4">
+                                <i class="fas fa-list me-2"></i>
+                                Related Sessions
+                            </h4>
+
+                            {% for related_session in related_sessions %}
+                            <div class="related-card mb-3">
+                                <div class="related-title">
+                                    <a href="{% url 'session_detail' related_session.id %}" class="text-decoration-none">
+                                        {{ related_session.title|truncatechars:30 }}
+                                    </a>
+                                </div>
+                                <div class="related-meta">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ related_session.upload_date|date:"M d, Y" }}
+                                    <span class="mx-2">•</span>
+                                    <i class="fas fa-users me-1"></i>
+                                    Batch {{ related_session.batch }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Quick Stats -->
+                        <div class="session-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Batch Overview
+                            </h5>
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <div style="font-size: 2.5em; font-weight: bold; color: #934CD2;">
+                                        {{ session.batch }}
+                                    </div>
+                                    <div style="color: #6c757d;">Current Batch</div>
+                                </div>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <div class="text-center">
+                                        <div style="font-size: 1.5em; font-weight: bold; color: #28a745;">
+                                            {{ related_sessions.count|add:1 }}
+                                        </div>
+                                        <div style="font-size: 0.8em; color: #6c757d;">Total Sessions</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div style="font-size: 1.5em; font-weight: bold; color: #007bff;">
+                                            Batch
+                                        </div>
+                                        <div style="font-size: 0.8em; color: #6c757d;">Sessions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

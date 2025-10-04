@@ -1,0 +1,601 @@
+{% load static %}
+{% load attendance_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Trainees Attendance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainer_dashboard.css' %}">
+    <style>
+        .attendance-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .attendance-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        .attendance-header {
+            background: linear-gradient(90deg, #934CD2 0%, #3B82F6 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .attendance-header h2 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .attendance-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .table-responsive {
+            border-radius: 0 0 15px 15px;
+        }
+
+        .attendance-table {
+            margin-bottom: 0;
+        }
+
+        .attendance-table thead th {
+            background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            font-weight: 600;
+            color: #495057;
+            padding: 20px 15px;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .attendance-table tbody tr {
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .attendance-table tbody tr:hover {
+            background-color: #f8f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .attendance-table tbody td {
+            padding: 20px 15px;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .trainee-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .trainee-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #934CD2, #3B82F6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .trainee-details h5 {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .trainee-details small {
+            color: #6c757d;
+        }
+
+        .attendance-status {
+            min-width: 300px;
+        }
+
+        .status-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .status-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #934CD2;
+        }
+
+        .status-option label {
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .absent-options {
+            margin-top: 15px;
+            margin-left: 28px;
+            padding: 15px;
+            background: linear-gradient(135deg, #fff7e6 0%, #ffeaa7 100%);
+            border-radius: 10px;
+            border-left: 4px solid #fdcb6e;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .absent-options .status-option {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .remarks-field {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .remarks-field:focus {
+            outline: none;
+            border-color: #934CD2;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(147, 76, 210, 0.1);
+        }
+
+        .remarks-field:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, #934CD2 0%, #3B82F6 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(147, 76, 210, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(147, 76, 210, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .form-check-input {
+            cursor: pointer;
+            transform: scale(1.1);
+        }
+
+        .form-check-label {
+            font-weight: 500;
+            margin-left: 5px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .attendance-container {
+                padding: 10px;
+            }
+
+            .attendance-header {
+                padding: 20px;
+            }
+
+            .attendance-header h2 {
+                font-size: 1.8em;
+            }
+
+            .attendance-table {
+                font-size: 0.9em;
+            }
+
+            .attendance-table tbody td {
+                padding: 15px 10px;
+            }
+
+            .absent-options {
+                margin-left: 20px;
+                padding: 12px;
+            }
+        }
+
+        /* Custom scrollbar */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #934CD2, #3B82F6);
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #764ba2, #2c5aa0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    {% include 'trainer/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content px-2">
+        <div class="attendance-header mb-4 p-4 rounded shadow-sm d-flex align-items-center justify-content-between" style="background: linear-gradient(90deg, #934CD2 0%, #3B82F6 100%); color: #fff;">
+            <div>
+                <h2 class="mb-1" style="font-weight:700;">My Trainees Attendance</h2>
+                <div style="font-size:1.1rem;">Track, update, and review attendance for your assigned trainees.</div>
+            </div>
+            <i class="fas fa-calendar-check fa-3x"></i>
+        </div>
+        <form method="post" id="attendanceForm">
+            {% csrf_token %}
+            {% for batch, trainees in batch_dict.items %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-gradient" style="background: linear-gradient(90deg, #934CD2 0%, #3B82F6 100%); color: black; font-weight:600;">
+                    Batch: {{ batch }}
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="fas fa-user"></i> Trainee</th>
+                                    <th><i class="fas fa-book"></i> Course</th>
+                                    <th colspan="3">Attendance Status</th>
+                                    <th><i class="fas fa-sticky-note"></i> Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trainee in trainees %}
+                                <tr>
+                                    <td class="fw-bold">
+                                        <div class="trainee-info">
+                                            <div class="trainee-avatar">
+                                                {{ trainee.user.first_name|first|default:trainee.user.username|first|upper }}
+                                            </div>
+                                            <div class="trainee-details">
+                                                <h5><span class="trainee-name" data-trainee-id="{{ trainee.id }}">{{ trainee.user.get_full_name|default:trainee.user.username }}</span></h5>
+                                                <small class="text-muted">{{ trainee.user.email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ trainee.course.name }}</strong><br>
+                                            <small class="text-muted" style="color: #000000 !important;">{{ trainee.batch|default:"Not Assigned" }}</small>
+                                        </div>
+                                    </td>
+                                    <td class="attendance-status">
+                                        <div class="status-options">
+                                            <div class="status-option" style="display: flex; align-items: center; gap: 10px;">
+{{ ... }}
+                                                <input class="form-check-input" type="radio" name="status_{{ trainee.id }}" id="status_{{ trainee.id }}_present" value="present" {% if trainee_status|get_item:trainee.id == 'present' %}checked{% endif %}>
+                                                <label class="form-check-label" for="status_{{ trainee.id }}_present">
+                                                    <i class="fas fa-check-circle text-success"></i> Present
+                                                </label>
+                                            </div>
+                                            <div class="status-option">
+                                                <input class="form-check-input absent-radio" type="radio" name="status_{{ trainee.id }}" id="status_{{ trainee.id }}_absent" value="absent" {% if trainee_status|get_item:trainee.id in 'absent,informed,not_informed' %}checked{% endif %}>
+                                                <label class="form-check-label" for="status_{{ trainee.id }}_absent">
+                                                    <i class="fas fa-times-circle text-danger"></i> Absent
+                                                </label>
+                                            </div>
+                                            <div class="absent-options" id="absent_options_{{ trainee.id }}" {% if trainee_status|get_item:trainee.id in 'absent,informed,not_informed' %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+                                                <div class="status-option">
+                                                    <input class="form-check-input" type="radio" name="absent_type_{{ trainee.id }}" id="absent_informed_{{ trainee.id }}" value="informed" {% if trainee_status|get_item:trainee.id == 'informed' %}checked{% endif %}>
+                                                    <label class="form-check-label" for="absent_informed_{{ trainee.id }}">
+                                                        <i class="fas fa-info-circle text-info"></i> Informed Absence
+                                                    </label>
+                                                </div>
+                                                <div class="status-option">
+                                                    <input class="form-check-input" type="radio" name="absent_type_{{ trainee.id }}" id="absent_not_informed_{{ trainee.id }}" value="not_informed" {% if trainee_status|get_item:trainee.id == 'not_informed' %}checked{% endif %}>
+                                                    <label class="form-check-label" for="absent_not_informed_{{ trainee.id }}">
+                                                        <i class="fas fa-exclamation-triangle text-warning"></i> Not Informed
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="remarks_{{ trainee.id }}" class="form-control form-control-sm remarks-field"
+                                               placeholder="Add remarks..." value="{% if trainee_status|get_item:trainee.id in 'informed,not_informed' %}{{ trainee_remarks|get_item:trainee.id }}{% endif %}"
+                                               {% if trainee_status|get_item:trainee.id not in 'informed,not_informed' %}disabled{% endif %}>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted" style="padding: 50px;">
+                                        <i class="fas fa-users fa-3x mb-3 text-muted"></i><br>
+                                        No trainees in this batch.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="d-grid gap-2 mt-3">
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save"></i> Submit Attendance
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        // Handle absent radio button clicks to show/hide sub-options
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing attendance form...');
+
+            // Function to update absent options visibility
+            function updateAbsentOptions(traineeId, show) {
+                console.log('=== UPDATE ABSENT OPTIONS ===');
+                console.log('Trainee ID:', traineeId, 'Type:', typeof traineeId);
+                console.log('Show:', show);
+
+                const absentOptions = document.getElementById(`absent_options_${traineeId}`);
+                const remarksField = document.querySelector(`input[name="remarks_${traineeId}"]`);
+
+                console.log('Looking for absent_options element:', `absent_options_${traineeId}`);
+                console.log('Looking for remarks field:', `input[name="remarks_${traineeId}"]`);
+
+                if (absentOptions) {
+                    absentOptions.style.display = show ? 'block' : 'none';
+                    console.log('✅ Absent options found and visibility set to:', absentOptions.style.display);
+                } else {
+                    console.log('❌ Absent options element NOT found for trainee', traineeId);
+                    // Debug: list all elements with similar IDs
+                    const allAbsentOptions = document.querySelectorAll('[id*="absent_options"]');
+                    console.log('All absent options elements found:', allAbsentOptions.length);
+                    allAbsentOptions.forEach(el => console.log('  -', el.id));
+                }
+
+                if (remarksField) {
+                    remarksField.disabled = !show;
+                    if (!show) {
+                        remarksField.value = '';
+                    }
+                    console.log('✅ Remarks field found, disabled state:', remarksField.disabled);
+                } else {
+                    console.log('❌ Remarks field NOT found for trainee', traineeId);
+                    // Debug: list all remarks fields
+                    const allRemarksFields = document.querySelectorAll('input[name*="remarks"]');
+                    console.log('All remarks fields found:', allRemarksFields.length);
+                    allRemarksFields.forEach(el => console.log('  -', el.name, 'Disabled:', el.disabled));
+                }
+                console.log('=== END UPDATE ===');
+            }
+
+            // Handle absent radio button clicks
+            const absentRadios = document.querySelectorAll('.absent-radio');
+            console.log('Found absent radios:', absentRadios.length);
+            absentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    console.log('=== ABSENT RADIO CLICKED ===');
+                    console.log('Absent radio changed, checked:', this.checked, 'ID:', this.id);
+                    if (this.checked) {
+                        // Extract trainee ID from ID like "status_123_absent" or "status_123"
+                        const idParts = this.id.split('_');
+                        console.log('ID parts:', idParts);
+                        // Trainee ID is always in position 1 (middle) for status radio buttons
+                        const traineeId = idParts[1];
+                        console.log('Extracted trainee ID:', traineeId, 'Type:', typeof traineeId);
+                        updateAbsentOptions(traineeId, true);
+                    }
+                    console.log('=== END ABSENT RADIO ===');
+                });
+            });
+
+            // Handle present radio button clicks
+            const presentRadios = document.querySelectorAll('input[name^="status_"][value="present"]');
+            console.log('Found present radios:', presentRadios.length);
+            presentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    console.log('=== PRESENT RADIO CLICKED ===');
+                    console.log('Present radio changed, checked:', this.checked, 'Name:', this.name);
+                    if (this.checked) {
+                        // Extract trainee ID from name like "status_123"
+                        const nameParts = this.name.split('_');
+                        console.log('Name parts:', nameParts);
+                        // Trainee ID is always in position 1 (middle) for status radio buttons
+                        const traineeId = nameParts[1];
+                        console.log('Extracted trainee ID from present:', traineeId, 'Type:', typeof traineeId);
+
+                        // Hide absent options and clear remarks field
+                        updateAbsentOptions(traineeId, false);
+
+                        // Clear remarks field when switching to present
+                        const remarksField = document.querySelector(`input[name="remarks_${traineeId}"]`);
+                        if (remarksField) {
+                            remarksField.value = '';
+                            remarksField.disabled = true;
+                            console.log('✅ Cleared and disabled remarks field for trainee', traineeId);
+                        }
+                    }
+                    console.log('=== END PRESENT RADIO ===');
+                });
+            });
+
+            // Initialize state based on current selections
+            const allStatusRadios = document.querySelectorAll('input[name^="status_"]');
+            console.log('=== INITIALIZATION ===');
+            console.log('Found all status radios:', allStatusRadios.length);
+            allStatusRadios.forEach(radio => {
+                if (radio.checked) {
+                    // Extract trainee ID from name like "status_123"
+                    const nameParts = radio.name.split('_');
+                    console.log('Initializing - Radio name:', radio.name, 'Value:', radio.value, 'Name parts:', nameParts);
+                    // Trainee ID is always in position 1 (middle) for status radio buttons
+                    const traineeId = nameParts[1];
+                    const status = radio.value;
+                    const shouldShow = status === 'absent' || status === 'informed' || status === 'not_informed';
+                    console.log('Initializing trainee', traineeId, 'with status', status, 'should show:', shouldShow);
+                    updateAbsentOptions(traineeId, shouldShow);
+
+                    // Handle remarks field based on status
+                    const remarksField = document.querySelector(`input[name="remarks_${traineeId}"]`);
+                    if (remarksField) {
+                        if (status === 'present') {
+                            // Clear and disable remarks for present status
+                            remarksField.value = '';
+                            remarksField.disabled = true;
+                            console.log('✅ Cleared and disabled remarks field for present status - trainee', traineeId);
+                        } else if (status === 'informed' || status === 'not_informed') {
+                            // Enable remarks for informed/not informed
+                            remarksField.disabled = false;
+                            console.log('✅ Enabled remarks field for informed/not informed status - trainee', traineeId);
+                        }
+                    }
+                }
+            });
+
+            // Handle absent type radio buttons (informed/not informed)
+            const absentTypeRadios = document.querySelectorAll('input[name^="absent_type_"]');
+            console.log('Found absent type radios:', absentTypeRadios.length);
+            absentTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    console.log('=== ABSENT TYPE RADIO CLICKED ===');
+                    console.log('Absent type radio changed, name:', this.name, 'value:', this.value);
+                    if (this.checked) {
+                        // Extract trainee ID from name like "absent_type_123"
+                        const nameParts = this.name.split('_');
+                        console.log('Absent type name parts:', nameParts);
+                        // Trainee ID is always in position 2 (last) for absent_type radio buttons
+                        const traineeId = nameParts[2];
+                        console.log('Extracted trainee ID from absent type:', traineeId, 'Type:', typeof traineeId);
+                        const remarksField = document.querySelector(`input[name="remarks_${traineeId}"]`);
+                        if (remarksField) {
+                            remarksField.disabled = false;
+                            console.log('✅ Enabled remarks field from absent type selection for trainee', traineeId);
+                        } else {
+                            console.log('❌ Remarks field not found for trainee', traineeId, 'from absent type handler');
+                        }
+                    }
+                    console.log('=== END ABSENT TYPE RADIO ===');
+                });
+            });
+
+            // Handle trainee name clicks to show attendance details
+            const traineeNames = document.querySelectorAll('.trainee-name');
+            console.log('Found trainee names:', traineeNames.length);
+            traineeNames.forEach(nameElement => {
+                nameElement.addEventListener('click', function() {
+                    const traineeId = this.getAttribute('data-trainee-id');
+                    console.log('Trainee name clicked, ID:', traineeId);
+                    if (traineeId) {
+                        // Navigate to attendance detail page (not new tab)
+                        window.location.href = `/trainee-attendance-detail/${traineeId}/`;
+                    }
+                });
+            });
+
+            // Handle form submission with success message
+            const attendanceForm = document.getElementById('attendanceForm');
+            if (attendanceForm) {
+                attendanceForm.addEventListener('submit', showSuccessMessage);
+            }
+
+            console.log('Attendance form initialization complete');
+        });
+
+        // Success message function with page refresh
+        function showSuccessMessage(event) {
+            // Show success toast
+            const toastHtml = `
+                <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Attendance saved successfully! Refreshing...
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing toast if any
+            const existingToast = document.getElementById('successToast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            // Add new toast to body
+            document.body.insertAdjacentHTML('beforeend', toastHtml);
+
+            // Initialize and show toast
+            const toastElement = document.getElementById('successToast');
+            const toast = new bootstrap.Toast(toastElement, {
+                autohide: true,
+                delay: 2000
+            });
+            toast.show();
+
+            // Submit form after toast is shown
+            setTimeout(() => {
+                event.target.submit();
+            }, 500);
+
+            // Remove toast after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                this.remove();
+            });
+        }
+    </script>

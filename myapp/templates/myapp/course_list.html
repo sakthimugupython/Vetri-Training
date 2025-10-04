@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/course_list.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    {% include 'myapp/_sidebar.html' %}
+    <div class="main-content">
+        <div class="course-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h3 class="course-title">Courses</h3>
+                <div class="course-subtitle">Add, update, and manage all courses.</div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <button class="icon-btn"><i class="fas fa-search"></i></button>
+                <button class="icon-btn"><i class="fas fa-envelope"></i></button>
+                <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                <div class="user-info ms-2">
+                    <div class="user-role">VTS Admin</div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center mb-2 gap-2">
+            <button class="list-view-btn btn btn-success" style="background:linear-gradient(90deg,#52fe97 0%,#3865ff 100%);color:#fff;font-weight:600;">List View</button>
+            <button class="card-view-btn btn btn-success" style="background:linear-gradient(90deg,#00c853 0%,#52fe97 100%);color:#fff;font-weight:600;">Card View</button>
+            <a href="{% url 'add_course' %}" class="add-course-btn btn btn-success" style="background:linear-gradient(180deg,#00EA5E 0%,#04682D 100%);color:#fff;font-weight:600;">Add New Course</a>
+        </div>
+        <div id="course-list-view">
+            <div class="course-table-wrapper table-responsive">
+                <table class="table course-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Course ID</th>
+                            <th>Course Name</th>
+                            <th>Trainer</th>
+                            <th>Status</th>
+                            <th>Enrolled</th>
+                            <th>Duration</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        <tr>
+                            <td>{{ course.id }}</td>
+                            <td>{{ course.name }}</td>
+                            <td>
+                                {% if course.trainer %}
+                                    {{ course.trainer.user.get_full_name|default:course.trainer.user.username }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{% if course.is_active %}Active{% else %}Inactive{% endif %}</td>
+                            <td>{{ course.trainees.count }}</td>
+                            <td>{% if course.duration %}{{ course.duration }}{% else %}-{% endif %}</td>
+                            <td>
+                                <a href="{% url 'edit_course' course.id %}" class="btn btn-primary edit-btn">Edit</a>
+                                <a href="{% url 'delete_course' course.id %}" class="btn btn-danger ms-2">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="text-center">No courses found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="course-card-view" style="display:none;">
+            <div class="row g-4">
+                {% for course in courses %}
+                <div class="col-md-4 col-lg-4 col-xl-4">
+                    <div class="course-card shadow-sm">
+                        <img src="{% if course.cover_image %}{{ course.cover_image.url }}{% else %}{% static 'myapp/img/default-course.jpg' %}{% endif %}" class="course-card-img-top img-fluid d-block mx-auto" alt="{{ course.name }}" style="width:100%;height: 300px; border-radius:12px 12px 0 0;">
+                        <div class="p-3">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="course-card-title fs-3 fw-bold" style="color: #b27aff;">{{ course.name }}</span>
+                                <span class="course-card-id fw-bold fs-4">{{ course.id }}</span>
+                            </div>
+                            <div class="course-card-info p-2" style="background:linear-gradient(90deg,#b27aff 0%,#7498fe 100%);border-radius:8px;color:#fff;">
+                                <div>Duration <span class="float-end">{% if course.duration %}{{ course.duration }}{% else %}-{% endif %}</span></div>
+                                <div>Mode <span class="float-end">{% if course.mode %}{{ course.mode|title }}{% else %}-{% endif %}</span></div>
+                                <div>Category <span class="float-end">{% if course.category %}{{ course.category|title }}{% else %}-{% endif %}</span></div>
+                                <div>Trainer Assigned <span class="float-end">{% if course.trainer %}{{ course.trainer.user.get_full_name|default:course.trainer.user.username }}{% else %}-{% endif %}</span></div>
+                            </div>
+                            <div class="d-flex justify-content-end mt-2">
+                                <a href="{% url 'edit_course' course.id %}" class="btn btn-primary btn-sm me-2">Edit</a>
+                                <a href="{% url 'delete_course' course.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">No courses found.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <script>
+        // Toggle between list and card view
+        document.querySelector('.card-view-btn').onclick = function() {
+            document.getElementById('course-list-view').style.display = 'none';
+            document.getElementById('course-card-view').style.display = '';
+        };
+        document.querySelector('.list-view-btn').onclick = function() {
+            document.getElementById('course-list-view').style.display = '';
+            document.getElementById('course-card-view').style.display = 'none';
+        };
+        </script>
+    </div>
+</body>
+</html>
