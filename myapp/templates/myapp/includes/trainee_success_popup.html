@@ -1,7 +1,10 @@
 {% load static %}
 <div id="trainee-success-popup" class="trainee-success-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(56,101,255,0.12);padding:40px 32px;z-index:9999;text-align:center;min-width:350px;max-width:90vw;">
-    <img src="{% static 'myapp/img/success-check.png' %}" alt="Success" style="width:90px;height:90px;">
-    <div style="font-size:1.3rem;font-weight:600;margin-top:18px;">New trainee added! You can now assign<br>them to courses and trainers.</div>
+    <div style="width:90px;height:90px;background:#10b981;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-check" style="font-size:2.5rem;color:#fff;"></i>
+    </div>
+    <div style="font-size:1.3rem;font-weight:600;margin-bottom:12px;">New trainee added!</div>
+    <div style="color:#6b7280;font-size:0.95rem;">You can now assign them to courses and trainers.</div>
 </div>
 {% if show_success %}
 <script>
@@ -11,7 +14,7 @@
             popup.style.display = 'block';
             setTimeout(function() {
                 popup.style.display = 'none';
-            }, 2500);
+            }, 3000);
         }
     }
     document.addEventListener('DOMContentLoaded', showTraineeSuccessPopup);

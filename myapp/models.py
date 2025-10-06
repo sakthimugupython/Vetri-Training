@@ -67,8 +67,10 @@ class Certificate(models.Model):
 
 	def save(self, *args, **kwargs):
 		if not self.certificate_number:
-			# Generate unique certificate number
-			self.certificate_number = f"CERT-{self.trainee.id}-{self.course.id}-{self.issued_date.strftime('%Y%m%d')}"
+			# Generate unique certificate number using current date
+			from django.utils import timezone
+			current_date = timezone.now().date()
+			self.certificate_number = f"CERT-{self.trainee.id}-{self.course.id}-{current_date.strftime('%Y%m%d')}"
 		super().save(*args, **kwargs)
 
 	def __str__(self):

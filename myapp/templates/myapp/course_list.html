@@ -1,5 +1,5 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,9 +8,255 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'myapp/css/course_list.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Enhanced Hamburger Button for Admin Courses Page */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important; /* Back to original position */
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important; /* Purple to blue gradient */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem !important;
+            font-size: 1.25rem !important;
+            cursor: pointer !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: none !important; /* Hidden by default - only show on mobile */
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #2980b9 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6) !important;
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Sidebar Close Button */
+        .sidebar-close {
+            position: fixed !important;
+            top: 1rem !important;
+            right: 1rem !important;
+            z-index: 1001 !important;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important; /* Red gradient */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: none !important;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .sidebar-close:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6) !important;
+        }
+
+        .sidebar-close:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle, .sidebar-close {
+                display: none !important;
+            }
+        }
+
+        /* Mobile: Show hamburger prominently */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important; /* Back to original position */
+                left: 1rem !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                width: 50px !important;
+                height: 50px !important;
+                box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            }
+
+            .sidebar.active ~ .sidebar-close {
+                display: block !important;
+            }
+        }
+
+        /* Enhanced Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #222e3a;
+            color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0); /* Show by default on desktop */
+        }
+
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%); /* Hide by default on mobile */
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0) !important; /* Show when active */
+                z-index: 1000 !important;
+            }
+        }
+
+        /* Main Content - Enhanced Responsive */
+        .main-content {
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+
+            .course-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                margin-top: 4rem; /* Push topbar below hamburger button */
+            }
+
+            .course-title {
+                font-size: 1.5rem;
+            }
+
+            .course-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .user-info {
+                text-align: center;
+            }
+
+            /* Keep icons in single row on mobile */
+            .course-header .d-flex:last-child {
+                flex-direction: row !important;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .course-header .icon-btn {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            /* Responsive table */
+            .table-responsive {
+                font-size: 0.85rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem 0.25rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .table th:nth-child(1), .table td:nth-child(1) {
+                width: 15%;
+            }
+
+            .table th:nth-child(2), .table td:nth-child(2) {
+                width: 25%;
+            }
+
+            .table th:nth-child(3), .table td:nth-child(3) {
+                width: 20%;
+            }
+
+            .table th:nth-child(4), .table td:nth-child(4),
+            .table th:nth-child(5), .table td:nth-child(5),
+            .table th:nth-child(6), .table td:nth-child(6) {
+                width: 10%;
+            }
+
+            .table th:nth-child(7), .table td:nth-child(7) {
+                width: 20%;
+            }
+
+            /* Card view responsive */
+            .course-card {
+                margin-bottom: 1.5rem;
+            }
+
+            .course-card-img-top {
+                height: 200px !important;
+            }
+
+            /* Action buttons stacking */
+            .d-flex.justify-content-end {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .btn-sm {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Desktop responsive adjustments */
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+                padding: 2rem;
+                width: calc(100% - 280px);
+            }
+        }
+
+        /* Improved card responsiveness */
+        @media (max-width: 576px) {
+            .col-md-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Close Button (Mobile) -->
+    <button class="sidebar-close" onclick="toggleSidebar()">
+        <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Sidebar -->
     {% include 'myapp/_sidebar.html' %}
+
     <div class="main-content">
         <div class="course-header d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div>
@@ -26,7 +272,7 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-end align-items-center mb-2 gap-2">
+        <div class="d-flex justify-content-end align-items-center mb-2 gap-2 flex-wrap">
             <button class="list-view-btn btn btn-success" style="background:linear-gradient(90deg,#52fe97 0%,#3865ff 100%);color:#fff;font-weight:600;">List View</button>
             <button class="card-view-btn btn btn-success" style="background:linear-gradient(90deg,#00c853 0%,#52fe97 100%);color:#fff;font-weight:600;">Card View</button>
             <a href="{% url 'add_course' %}" class="add-course-btn btn btn-success" style="background:linear-gradient(180deg,#00EA5E 0%,#04682D 100%);color:#fff;font-weight:600;">Add New Course</a>
@@ -49,20 +295,31 @@
                         {% for course in courses %}
                         <tr>
                             <td>{{ course.id }}</td>
-                            <td>{{ course.name }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{% if course.cover_image %}{{ course.cover_image.url }}{% else %}{% static 'myapp/img/default-course.jpg' %}{% endif %}"
+                                         class="rounded me-2"
+                                         alt="{{ course.name }}"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div>
+                                        <div class="fw-bold">{{ course.name }}</div>
+                                        <small class="text-muted">{{ course.category|title }}</small>
+                                    </div>
+                                </div>
+                            </td>
                             <td>
                                 {% if course.trainer %}
                                     {{ course.trainer.user.get_full_name|default:course.trainer.user.username }}
                                 {% else %}
-                                    -
+                                    <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
-                            <td>{% if course.is_active %}Active{% else %}Inactive{% endif %}</td>
+                            <td><span class="badge {% if course.is_active %}bg-success{% else %}bg-secondary{% endif %}">{% if course.is_active %}Active{% else %}Inactive{% endif %}</span></td>
                             <td>{{ course.trainees.count }}</td>
                             <td>{% if course.duration %}{{ course.duration }}{% else %}-{% endif %}</td>
                             <td>
-                                <a href="{% url 'edit_course' course.id %}" class="btn btn-primary edit-btn">Edit</a>
-                                <a href="{% url 'delete_course' course.id %}" class="btn btn-danger ms-2">Delete</a>
+                                <a href="{% url 'edit_course' course.id %}" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="{% url 'delete_course' course.id %}" class="btn btn-danger btn-sm ms-1">Delete</a>
                             </td>
                         </tr>
                         {% empty %}
@@ -75,23 +332,46 @@
         <div id="course-card-view" style="display:none;">
             <div class="row g-4">
                 {% for course in courses %}
-                <div class="col-md-4 col-lg-4 col-xl-4">
-                    <div class="course-card shadow-sm">
-                        <img src="{% if course.cover_image %}{{ course.cover_image.url }}{% else %}{% static 'myapp/img/default-course.jpg' %}{% endif %}" class="course-card-img-top img-fluid d-block mx-auto" alt="{{ course.name }}" style="width:100%;height: 300px; border-radius:12px 12px 0 0;">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="course-card shadow-sm h-100">
+                        <img src="{% if course.cover_image %}{{ course.cover_image.url }}{% else %}{% static 'myapp/img/default-course.jpg' %}{% endif %}"
+                             class="course-card-img-top img-fluid d-block mx-auto"
+                             alt="{{ course.name }}"
+                             style="width:100%;height: 200px; object-fit: cover; border-radius:12px 12px 0 0;">
                         <div class="p-3">
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="course-card-title fs-3 fw-bold" style="color: #b27aff;">{{ course.name }}</span>
-                                <span class="course-card-id fw-bold fs-4">{{ course.id }}</span>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="course-card-title fs-6 fw-bold text-truncate" style="color: #b27aff;" title="{{ course.name }}">{{ course.name }}</span>
+                                <span class="course-card-id fw-bold badge bg-primary fs-6">{{ course.id }}</span>
                             </div>
-                            <div class="course-card-info p-2" style="background:linear-gradient(90deg,#b27aff 0%,#7498fe 100%);border-radius:8px;color:#fff;">
-                                <div>Duration <span class="float-end">{% if course.duration %}{{ course.duration }}{% else %}-{% endif %}</span></div>
-                                <div>Mode <span class="float-end">{% if course.mode %}{{ course.mode|title }}{% else %}-{% endif %}</span></div>
-                                <div>Category <span class="float-end">{% if course.category %}{{ course.category|title }}{% else %}-{% endif %}</span></div>
-                                <div>Trainer Assigned <span class="float-end">{% if course.trainer %}{{ course.trainer.user.get_full_name|default:course.trainer.user.username }}{% else %}-{% endif %}</span></div>
+                            <div class="course-card-info p-2 mb-2" style="background:linear-gradient(90deg,#b27aff 0%,#7498fe 100%);border-radius:8px;color:#fff; font-size: 0.85rem;">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Duration</span>
+                                    <span>{% if course.duration %}{{ course.duration }}{% else %}-{% endif %}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Mode</span>
+                                    <span>{% if course.mode %}{{ course.mode|title }}{% else %}-{% endif %}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Category</span>
+                                    <span>{% if course.category %}{{ course.category|title }}{% else %}-{% endif %}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Trainer</span>
+                                    <span class="text-truncate" title="{% if course.trainer %}{{ course.trainer.user.get_full_name|default:course.trainer.user.username }}{% else %}Not Assigned{% endif %}">
+                                        {% if course.trainer %}{{ course.trainer.user.get_full_name|default:course.trainer.user.username }}{% else %}Not Assigned{% endif %}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-end mt-2">
-                                <a href="{% url 'edit_course' course.id %}" class="btn btn-primary btn-sm me-2">Edit</a>
-                                <a href="{% url 'delete_course' course.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge {% if course.is_active %}bg-success{% else %}bg-secondary{% endif %} fs-6">
+                                    {% if course.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                                <span class="text-muted small">{{ course.trainees.count }} enrolled</span>
+                            </div>
+                            <div class="d-flex justify-content-end gap-1">
+                                <a href="{% url 'edit_course' course.id %}" class="btn btn-primary btn-sm flex-fill">Edit</a>
+                                <a href="{% url 'delete_course' course.id %}" class="btn btn-danger btn-sm flex-fill">Delete</a>
                             </div>
                         </div>
                     </div>
@@ -101,7 +381,149 @@
                 {% endfor %}
             </div>
         </div>
-        <script>
+    </div>
+    <script>
+        // Enhanced hamburger functionality for Admin Courses Page
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            console.log('🍔 ADMIN COURSES HAMBURGER CLICKED!');
+            console.log('Sidebar found:', !!sidebar);
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Close button found:', !!closeBtn);
+            console.log('Window width:', window.innerWidth);
+
+            if (window.innerWidth <= 768) {
+                console.log('📱 Mobile mode detected');
+                console.log('Sidebar current transform:', sidebar.style.transform);
+                console.log('Sidebar current classList:', sidebar.classList.toString());
+
+                // Toggle the active class
+                const isActive = sidebar.classList.contains('active');
+                console.log('Currently active:', isActive);
+
+                if (isActive) {
+                    // Close sidebar
+                    sidebar.classList.remove('active');
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    console.log('🔒 Admin Courses: Sidebar CLOSED');
+                } else {
+                    // Open sidebar
+                    sidebar.classList.add('active');
+                    sidebar.style.transform = 'translateX(0)';
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                    console.log('🔓 Admin Courses: Sidebar OPENED');
+                }
+
+                console.log('Sidebar classList after toggle:', sidebar.classList.toString());
+                console.log('Sidebar transform after toggle:', sidebar.style.transform);
+            } else {
+                console.log('❌ Desktop mode - hamburger should be hidden');
+            }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768 &&
+                sidebar &&
+                toggleBtn &&
+                closeBtn &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target) &&
+                !closeBtn.contains(event.target)) {
+
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(-100%)';
+                toggleBtn.style.display = 'block';
+                closeBtn.style.display = 'none';
+                console.log('🚪 Admin Courses: Sidebar closed via outside click');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(0)';
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('💻 Admin Courses: Desktop view - sidebar always visible');
+            } else {
+                // On mobile, ensure hamburger is visible and sidebar hidden (unless active)
+                if (!sidebar.classList.contains('active')) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                }
+                console.log('📱 Admin Courses: Mobile view - hamburger/close button management');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            console.log('🚀 ADMIN COURSES PAGE INITIALIZING...');
+            console.log('Screen width:', window.innerWidth);
+
+            // Set initial state based on screen size
+            if (window.innerWidth <= 768) {
+                // MOBILE: Show hamburger, hide sidebar and close button
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('📱 Initial: Mobile mode - hamburger VISIBLE, sidebar HIDDEN');
+            } else {
+                // DESKTOP: Hide hamburger and close button, show sidebar
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('💻 Initial: Desktop mode - hamburger HIDDEN, sidebar VISIBLE');
+            }
+
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Close button found:', !!closeBtn);
+            console.log('Sidebar found:', !!sidebar);
+
+            // Force correct state after CSS loads
+            setTimeout(() => {
+                if (window.innerWidth <= 768) {
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    if (!sidebar.classList.contains('active')) {
+                        sidebar.style.transform = 'translateX(-100%)';
+                    }
+                    console.log('⏰ Force mobile state applied');
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    sidebar.style.transform = 'translateX(0)';
+                    console.log('⏰ Force desktop state applied');
+                }
+            }, 100);
+        });
+
         // Toggle between list and card view
         document.querySelector('.card-view-btn').onclick = function() {
             document.getElementById('course-list-view').style.display = 'none';
@@ -111,7 +533,7 @@
             document.getElementById('course-list-view').style.display = '';
             document.getElementById('course-card-view').style.display = 'none';
         };
-        </script>
-    </div>
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

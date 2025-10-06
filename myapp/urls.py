@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path('announcements/', views.announcements, name='announcements'),
     path('announcements/add/', views.add_announcement, name='add_announcement'),
+    path('announcements/<int:announcement_id>/delete/', views.delete_announcement, name='delete_announcement'),
     path('announcements/<int:announcement_id>/edit/', views.edit_announcement, name='edit_announcement'),
     path('', views.login_options, name='login_options'),
     path('admin-login/', views.admin_login, name='admin_login'),
@@ -46,8 +47,13 @@ urlpatterns = [
 
     # Trainer Announcement URLs
     path('trainer-announcements/', views.trainer_announcements, name='trainer_announcements'),
+    path('trainer-announcements/create/', views.create_announcement, name='create_announcement'),
+
+    # Trainee Announcement URLs
+    path('trainee-announcements/', views.trainee_announcements, name='trainee_announcements'),
 
     # Certificate URLs
     path('certificates/', views.student_certificates, name='student_certificates'),
     path('admin-certificates/', views.admin_certificates, name='admin_certificates'),
+    path('certificates/<int:certificate_id>/download/', views.download_certificate, name='download_certificate'),
 ]

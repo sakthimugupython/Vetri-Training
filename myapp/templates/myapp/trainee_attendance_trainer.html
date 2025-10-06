@@ -24,6 +24,150 @@
             max-width: 1200px;
         }
 
+        /* Hamburger Button - DEBUG VERSION - FORCE VISIBLE */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 999999 !important; /* Extremely high z-index */
+            background: #ff0000 !important; /* Bright red for debugging */
+            color: white !important;
+            border: 3px solid #ffffff !important;
+            border-radius: 12px !important;
+            padding: 1rem !important;
+            font-size: 1.5rem !important;
+            cursor: pointer !important;
+            width: 60px !important;
+            height: 60px !important;
+            display: block !important; /* FORCE VISIBLE */
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.9) !important;
+            animation: debugPulse 1.5s infinite !important;
+            transform: rotate(0deg) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: #cc0000 !important;
+            transform: scale(1.1) rotate(5deg) !important;
+            box-shadow: 0 0 35px rgba(255, 0, 0, 1) !important;
+        }
+
+        @keyframes debugPulse {
+            0% { 
+                transform: scale(1) rotate(0deg); 
+                box-shadow: 0 0 25px rgba(255, 0, 0, 0.9); 
+            }
+            50% { 
+                transform: scale(1.05) rotate(2deg); 
+                box-shadow: 0 0 35px rgba(255, 0, 0, 1); 
+            }
+            100% { 
+                transform: scale(1) rotate(0deg); 
+                box-shadow: 0 0 25px rgba(255, 0, 0, 0.9); 
+            }
+        }
+
+        /* FORCE SHOW ON MOBILE - OVERRIDE EVERYTHING */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 999999 !important;
+                background: #ff0000 !important;
+                border: 4px solid #ffffff !important;
+                width: 60px !important;
+                height: 60px !important;
+                animation: debugPulse 1.5s infinite !important;
+                transform: rotate(0deg) !important;
+            }
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: #23243a;
+            color: #fff;
+            min-width: 220px;
+            max-width: 240px;
+            height: 100vh;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 16px rgba(102, 126, 234, 0.2);
+            padding-top: 0.5rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transform: translateX(0); /* Show by default on desktop */
+        }
+
+        /* Hide sidebar on mobile by default */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%); /* Hide on mobile by default */
+            }
+
+            .sidebar.active {
+                transform: translateX(0); /* Show when active */
+            }
+        }
+
+        .sidebar .logo {
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0 1.2rem;
+        }
+
+        .sidebar nav .nav-link {
+            color: #fff;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 1rem;
+            margin-bottom: 2px;
+            transition: background 0.2s, font-weight 0.2s;
+            text-decoration: none;
+        }
+
+        .sidebar nav .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .sidebar nav .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar nav .nav-link:hover {
+            background: rgba(102, 126, 234, 0.2);
+            color: #fff;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            padding: 1.5rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
         .attendance-header {
             background: linear-gradient(90deg, #934CD2 0%, #3B82F6 100%);
             color: white;
@@ -223,31 +367,156 @@
             margin-left: 5px;
         }
 
-        /* Responsive design */
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .attendance-container {
-                padding: 10px;
+            .sidebar-toggle {
+                display: block;
             }
 
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            /* Add backdrop overlay */
+            .sidebar.active::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: -1;
+            }
+
+            /* Prevent horizontal scrolling on mobile */
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            /* Mobile responsive adjustments */
             .attendance-header {
-                padding: 20px;
+                padding: 1.5rem;
+                text-align: center;
+                border-radius: 15px;
             }
 
             .attendance-header h2 {
-                font-size: 1.8em;
+                font-size: 1.5rem;
+            }
+
+            .attendance-header p {
+                font-size: 0.9rem;
+            }
+
+            .card {
+                margin-bottom: 1.5rem;
+                border-radius: 15px;
+            }
+
+            .card-header {
+                padding: 1rem;
+                font-size: 1.1rem;
             }
 
             .attendance-table {
-                font-size: 0.9em;
+                font-size: 0.85rem;
+            }
+
+            .attendance-table thead th {
+                padding: 0.8rem 0.5rem;
+                font-size: 0.8rem;
             }
 
             .attendance-table tbody td {
-                padding: 15px 10px;
+                padding: 0.8rem 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .trainee-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .trainee-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .trainee-details h5 {
+                font-size: 1rem;
+            }
+
+            .attendance-status {
+                min-width: auto;
+            }
+
+            .status-options {
+                gap: 0.8rem;
             }
 
             .absent-options {
-                margin-left: 20px;
-                padding: 12px;
+                margin-left: 0;
+                margin-top: 1rem;
+                padding: 1rem;
+            }
+
+            .absent-options .status-option {
+                padding: 0.6rem 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .remarks-field {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .submit-btn {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+                width: 100%;
+            }
+
+            .form-check-input {
+                transform: scale(1.2);
+            }
+        }
+
+        /* Tablet responsive adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .main-content {
+                padding: 1.25rem;
+            }
+
+            .attendance-table {
+                font-size: 0.95rem;
+            }
+
+            .attendance-table thead th {
+                padding: 1rem 0.75rem;
+            }
+
+            .attendance-table tbody td {
+                padding: 1rem 0.75rem;
+            }
+
+            .trainee-avatar {
+                width: 45px;
+                height: 45px;
             }
         }
 
@@ -272,11 +541,16 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: linear-gradient(135deg, #934CD2, #3B82F6) !important; color: white !important; font-size: 16px !important; padding: 12px !important; width: 45px !important; height: 45px !important;">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <!-- Sidebar -->
     {% include 'trainer/_sidebar.html' %}
 
     <!-- Main Content -->
-    <div class="main-content px-2">
+    <div class="main-content px-5">
         <div class="attendance-header mb-4 p-4 rounded shadow-sm d-flex align-items-center justify-content-between" style="background: linear-gradient(90deg, #934CD2 0%, #3B82F6 100%); color: #fff;">
             <div>
                 <h2 class="mb-1" style="font-weight:700;">My Trainees Attendance</h2>
@@ -380,13 +654,115 @@
         </form>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Handle absent radio button clicks to show/hide sub-options
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing attendance form...');
+        // Hamburger functionality for Trainee Attendance page
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
 
-            // Function to update absent options visibility
-            function updateAbsentOptions(traineeId, show) {
+            console.log('🍔 HAMBURGER CLICKED!');
+            console.log('Sidebar found:', !!sidebar);
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Window width:', window.innerWidth);
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('active');
+                console.log('Sidebar classList after toggle:', sidebar.classList.toString());
+
+                // Hide/show hamburger button based on sidebar state
+                if (sidebar.classList.contains('active')) {
+                    toggleBtn.style.display = 'none';
+                    console.log('✅ Sidebar opened, hiding hamburger');
+                } else {
+                    toggleBtn.style.display = 'block';
+                    console.log('✅ Sidebar closed, showing hamburger');
+                }
+            } else {
+                console.log('❌ Desktop mode - hamburger should be hidden');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth <= 768 &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                console.log('Attendance: Sidebar closed via outside click');
+            }
+        });
+
+        // Handle window resize with proper mobile detection
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const isMobile = window.innerWidth <= 768;
+
+            console.log('🔄 Window resized to:', window.innerWidth, 'Mobile:', isMobile);
+
+            if (!isMobile) {
+                // Desktop: hide hamburger, show sidebar permanently
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(0)';
+                toggleBtn.style.display = 'none';
+                console.log('💻 Desktop mode - sidebar always visible');
+            } else {
+                // Mobile: show hamburger, hide sidebar by default
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(-100%)';
+                toggleBtn.style.display = 'block';
+                console.log('📱 Mobile mode - hamburger visible, sidebar hidden');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            console.log('=== TRAINEE ATTENDANCE PAGE INITIALIZING ===');
+            console.log('Screen width:', window.innerWidth);
+
+            // Set initial state based on screen size
+            if (window.innerWidth <= 768) {
+                // MOBILE: Show hamburger, hide sidebar
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                console.log('📱 Attendance: Mobile mode - hamburger VISIBLE, sidebar HIDDEN');
+            } else {
+                // DESKTOP: Hide hamburger, show sidebar
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                console.log('💻 Attendance: Desktop mode - hamburger HIDDEN, sidebar VISIBLE');
+            }
+
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Sidebar found:', !!sidebar);
+
+            // Force correct state after a short delay to ensure CSS is loaded
+            setTimeout(() => {
+                if (window.innerWidth <= 768) {
+                    toggleBtn.style.display = 'block';
+                    sidebar.style.transform = 'translateX(-100%)';
+                    console.log('🔴 FORCE MOBILE: Hamburger visible, sidebar hidden');
+                } else {
+                    toggleBtn.style.display = 'none';
+                    sidebar.style.transform = 'translateX(0)';
+                    console.log('🟢 FORCE DESKTOP: Hamburger hidden, sidebar visible');
+                }
+            }, 100);
+        });
+
+        // Function to update absent options visibility
+        function updateAbsentOptions(traineeId, show) {
                 console.log('=== UPDATE ABSENT OPTIONS ===');
                 console.log('Trainee ID:', traineeId, 'Type:', typeof traineeId);
                 console.log('Show:', show);

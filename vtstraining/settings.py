@@ -74,14 +74,10 @@ WSGI_APPLICATION = 'vtstraining.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'vetritraining',
-                'USER': 'root',
-                'PASSWORD': 'sakthi',
-                'HOST': 'localhost',  # Or the IP address/hostname of your MySQL server
-                'PORT': '3306',      # Default MySQL port
-            }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 

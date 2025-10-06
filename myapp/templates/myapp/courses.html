@@ -21,6 +21,13 @@
         body {
             background: var(--light-bg);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scrolling globally */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         /* Sidebar */
@@ -124,7 +131,7 @@
 
         /* Top Header Bar */
         .top-header {
-            background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--info-color) 100%);
             color: white;
             border-radius: 20px;
             margin-bottom: 2rem;
@@ -208,7 +215,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #4facfe;
+            color: var(--primary-color);
             font-size: 1.2rem;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
@@ -236,19 +243,15 @@
         }
 
         .breadcrumb {
-            background: rgba(79, 172, 254, 0.1);
+            background: rgba(102, 126, 234, 0.1);
             border-radius: 12px;
             padding: 1rem 1.5rem;
             margin: 0;
-            border: 1px solid rgba(79, 172, 254, 0.2);
-        }
-
-        .breadcrumb-item {
-            font-size: 0.9rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
         }
 
         .breadcrumb-item a {
-            color: #4facfe;
+            color: var(--primary-color);
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -257,7 +260,7 @@
         }
 
         .breadcrumb-item a:hover {
-            color: #3b82f6;
+            color: var(--info-color);
         }
 
         .breadcrumb-item.active {
@@ -291,37 +294,37 @@
         }
 
         .btn-action.primary {
-            background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--info-color) 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         .btn-action.primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
         .btn-action.secondary {
             background: white;
-            color: #4facfe;
-            border: 2px solid #4facfe;
-            box-shadow: 0 2px 8px rgba(79, 172, 254, 0.1);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
         }
 
         .btn-action.secondary:hover {
-            background: #4facfe;
+            background: var(--primary-color);
             color: white;
             transform: translateY(-1px);
         }
 
         .btn-action.tertiary {
-            background: rgba(79, 172, 254, 0.1);
-            color: #4facfe;
-            border: 1px solid rgba(79, 172, 254, 0.3);
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(102, 126, 234, 0.3);
         }
 
         .btn-action.tertiary:hover {
-            background: rgba(79, 172, 254, 0.2);
+            background: rgba(102, 126, 234, 0.2);
             transform: translateY(-1px);
         }
 
@@ -373,19 +376,141 @@
             box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);
         }
 
-        /* Responsive Design */
+    <style>
+        /* Enhanced Hamburger Button for Courses Page */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; /* Purple gradient matching theme */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem !important;
+            font-size: 1.25rem !important;
+            cursor: pointer !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: none !important; /* Hidden by default - only show on mobile */
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6c5ce7 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Sidebar Close Button */
+        .sidebar-close {
+            position: fixed !important;
+            top: 1rem !important;
+            right: 1rem !important;
+            z-index: 1001 !important;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important; /* Red gradient */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: none !important;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .sidebar-close:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6) !important;
+        }
+
+        .sidebar-close:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle,
+            .sidebar-close {
+                display: none !important;
+            }
+        }
+
+        /* Mobile: Show hamburger prominently */
         @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1.5rem;
-                text-align: center;
-                padding: 1.5rem;
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                width: 50px !important;
+                height: 50px !important;
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
             }
 
-            .header-left {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
+            .sidebar.active ~ .sidebar-close {
+                display: block !important;
+            }
+        }
+
+        /* Enhanced Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #23243a;
+            color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0); /* Show by default on desktop */
+        }
+
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%); /* Hide by default on mobile */
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0) !important; /* Show when active */
+                z-index: 1000 !important;
+            }
+        }
+
+        /* Main Content - Enhanced Responsive */
+        .main-content {
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+
+            .top-header {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
             }
 
             .page-title {
@@ -393,6 +518,21 @@
             }
 
             .page-subtitle {
+                font-size: 1rem;
+            }
+
+            .course-card {
+                margin-bottom: 1.5rem;
+            }
+
+            .stats-badge {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
                 font-size: 1rem;
             }
 
@@ -405,11 +545,29 @@
                 font-size: 0.9rem;
             }
 
-            .stats-badge {
-                padding: 0.6rem 1.2rem;
+            /* Stack columns on mobile */
+            .col-lg-6, .col-xl-4 {
+                margin-bottom: 1rem;
+            }
+
+            .table-responsive {
                 font-size: 0.9rem;
             }
+
+            .table th, .table td {
+                padding: 0.5rem;
+            }
         }
+
+        /* Desktop responsive adjustments */
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+                padding: 2rem;
+                width: calc(100% - 280px);
+            }
+        }
+    </style>
     </style>
 </head>
 <body>
@@ -425,13 +583,13 @@
             <a href="{% url 'trainee_dashboard' %}" class="nav-link{% if request.resolver_match.url_name == 'trainee_dashboard' %} active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
             <a href="{% url 'my_courses' %}" class="nav-link{% if request.resolver_match.url_name == 'my_courses' %} active{% endif %}"><i class="fas fa-graduation-cap"></i> My Courses</a>
             <a href="{% url 'student_certificates' %}" class="nav-link{% if request.resolver_match.url_name == 'student_certificates' %} active{% endif %}"><i class="fas fa-certificate"></i> My Certificates</a>
-            <a href="{% url 'announcements' %}" class="nav-link{% if request.resolver_match.url_name == 'announcements' %} active{% endif %}"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="{% url 'trainee_announcements' %}" class="nav-link{% if request.resolver_match.url_name == 'trainee_announcements' %} active{% endif %}"><i class="fas fa-bullhorn"></i> Announcements</a>
             <a href="{% url 'student_logout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content py-0">
         <!-- Top Header Bar -->
         <div class="top-header">
             <div class="header-content">
@@ -519,51 +677,99 @@
                         </div>
                         <div style="font-size: 0.9rem; color: #37474f; font-weight: 600;">
                             {{ course_data.enrollment_date|date:"M d, Y"|default:"Not available" }}
-                    </div>
-
-                    <!-- Session Recordings -->
-                    <div>
-                        <h6 style="color: #4facfe; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-play-circle"></i> Recent Sessions
-                        {% if course_data.sessions %}
-                        <div style="max-height: 200px; overflow-y: auto;">
-                            {% for session in course_data.sessions %}
-                            <div class="session-item" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s;" onclick="window.open('{{ session.session_url }}', '_blank')">
-                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
-                                    <i class="fas fa-play-circle"></i>
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-weight: 600; font-size: 0.9rem; color: #2d3748; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        {{ session.title }}
-                                    <div style="font-size: 0.8rem; color: #718096; display: flex; align-items: center; gap: 0.5rem;">
-                                        <span><i class="fas fa-user"></i> {{ session.trainer.user.get_full_name|default:session.trainer.user.username }}</span>
-                                        <span><i class="fas fa-calendar"></i> {{ session.upload_date|date:"M/d" }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
                         </div>
-
-                        {% if course_data.total_sessions > 5 %}
-                        <div style="text-align: center; margin-top: 1rem;">
-                            <button style="background: none; border: 1px solid #4facfe; color: #4facfe; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;">
-                                View All {{ course_data.total_sessions }} Sessions
-                            </button>
-                        </div>
-                        {% endif %}
-
-                        {% else %}
-                        <div style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 12px; color: #718096;">
-                            <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                            <div style="font-size: 0.9rem;">No session recordings yet</div>
-                            <div style="font-size: 0.8rem; margin-top: 0.3rem;">Sessions will appear here once uploaded</div>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
+
+        <!-- Session Recordings Section -->
+        <div class="col-12">
+            <div style="background: white; border-radius: 25px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); border: none; overflow: hidden; margin-top: 2rem;">
+                <!-- Section Header -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; color: white; position: relative;">
+                    <div style="position: relative; z-index: 2;">
+                        <h4 style="margin: 0 0 0.5rem 0; font-weight: 800; font-size: 1.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                            <i class="fas fa-video"></i> All Session Recordings
+                        </h4>
+                        <p style="margin: 0; opacity: 0.9; font-size: 1rem;">
+                            Access all your course session recordings in one place
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Session Recordings Content -->
+                <div style="padding: 2rem;">
+                    {% if all_sessions %}
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; position: sticky; top: 0;">
+                                <tr>
+                                    <th style="padding: 1.2rem; text-align: left; font-weight: 700; font-size: 1rem;">Session Title</th>
+                                    <th style="padding: 1.2rem; text-align: center; font-weight: 700; font-size: 1rem;">Course</th>
+                                    <th style="padding: 1.2rem; text-align: center; font-weight: 700; font-size: 1rem;">Trainer</th>
+                                    <th style="padding: 1.2rem; text-align: center; font-weight: 700; font-size: 1rem;">Date</th>
+                                    <th style="padding: 1.2rem; text-align: center; font-weight: 700; font-size: 1rem;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for session in all_sessions %}
+                                <tr style="border-bottom: 1px solid #f0f0f0; transition: all 0.3s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='white'">
+                                    <td style="padding: 1.2rem; font-weight: 600; color: #2d3748;">
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                                                <i class="fas fa-play-circle"></i>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 1rem; margin-bottom: 0.3rem; line-height: 1.4;">{{ session.title }}</div>
+                                                {% if session.description %}
+                                                <div style="font-size: 0.85rem; color: #718096; line-height: 1.3;">{{ session.description|truncatechars:80 }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1.2rem; text-align: center;">
+                                        <span style="background: linear-gradient(135deg, #4facfe 0%, #3b82f6 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);">
+                                            {{ session.course_name|default:"General" }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1.2rem; text-align: center;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.8rem;">
+                                            <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                                                {{ session.trainer.user.first_name.0|default:"T" }}
+                                            </div>
+                                            <span style="font-size: 0.95rem; color: #4a5568; font-weight: 600;">{{ session.trainer.user.get_full_name|default:session.trainer.user.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1.2rem; text-align: center;">
+                                        <div style="font-size: 0.95rem; color: #4a5568; font-weight: 600;">{{ session.upload_date|date:"M/d/Y" }}</div>
+                                    </td>
+                                    <td style="padding: 1.2rem; text-align: center;">
+                                        <button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);" onclick="window.open('{{ session.session_url }}', '_blank')">
+                                            <i class="fas fa-play me-2"></i>Watch Session
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% else %}
+                    <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 20px; color: #718096;">
+                        <i class="fas fa-video-slash" style="font-size: 4rem; margin-bottom: 2rem; opacity: 0.5;"></i>
+                        <div style="font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem;">No Session Recordings Yet</div>
+                        <div style="font-size: 1rem; margin-bottom: 2rem;">Session recordings will appear here once your trainers upload them for your enrolled courses.</div>
+                        <div style="background: rgba(102, 126, 234, 0.1); padding: 1rem 2rem; border-radius: 10px; border: 2px dashed rgba(102, 126, 234, 0.3);">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Sessions are organized by course and batch. Check with your trainer for new uploads!
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
         <!-- No Courses Message -->
         {% if not courses_data %}
@@ -600,6 +806,41 @@
 @media (max-width: 768px) {
     .course-card {
         margin-bottom: 2rem;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .header-left {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+    }
+
+    .action-buttons {
+        justify-content: center;
+    }
+
+    .btn-action {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .stats-badge {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
     }
 }
 </style>

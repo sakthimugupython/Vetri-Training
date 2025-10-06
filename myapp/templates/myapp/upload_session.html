@@ -126,6 +126,132 @@
             background: rgba(147, 76, 210, 0.1);
         }
 
+        /* Hamburger Button - Upload Session Page */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: var(--primary-gradient) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: block !important;
+            box-shadow: 0 3px 10px rgba(147, 76, 210, 0.3) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 4px 15px rgba(147, 76, 210, 0.4) !important;
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #23243a;
+            color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0); /* Show by default on desktop */
+        }
+
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%); /* Hide by default on mobile */
+            }
+
+            .sidebar.active {
+                transform: translateX(0); /* Show when active */
+            }
+        }
+
+        /* Main Content - Enhanced Responsive */
+        .main-content {
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+
+            .upload-header {
+                padding: 2rem 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .upload-card {
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .batch-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-control, .form-select {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .upload-btn {
+                padding: 0.75rem 2rem;
+                font-size: 1rem;
+                width: 100%;
+            }
+
+            .file-input-label {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Stack batch cards on mobile */
+            .col-md-4 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Desktop responsive adjustments */
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+                padding: 2rem;
+                width: calc(100% - 280px);
+            }
+        }
+
         .url-input-group {
             position: relative;
         }
@@ -173,6 +299,11 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <!-- Sidebar -->
     {% include 'trainer/_sidebar.html' %}
 
@@ -290,12 +421,114 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // URL Preview functionality only
+        // Hamburger functionality for Upload Session page
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('active');
+
+                // Hide/show hamburger button based on sidebar state
+                if (sidebar.classList.contains('active')) {
+                    toggleBtn.style.display = 'none';
+                    console.log('Upload Session: Sidebar opened, hiding hamburger');
+                } else {
+                    toggleBtn.style.display = 'block';
+                    console.log('Upload Session: Sidebar closed, showing hamburger');
+                }
+            }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth <= 768 &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                console.log('Upload Session: Sidebar closed via outside click');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                console.log('Upload Session: Desktop view - hiding hamburger');
+            } else {
+                toggleBtn.style.display = 'block';
+                console.log('Upload Session: Mobile view - showing hamburger');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            console.log('=== UPLOAD SESSION PAGE INITIALIZING ===');
+
+            // Set initial state based on screen size
+            if (window.innerWidth <= 768) {
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                console.log('📱 Upload Session: Mobile mode - hamburger VISIBLE');
+            } else {
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                console.log('💻 Upload Session: Desktop mode - hamburger HIDDEN');
+            }
+
+            console.log('Screen width:', window.innerWidth);
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Sidebar found:', !!sidebar);
+        });
+
+        // URL Preview functionality
         document.getElementById('urlPreview').addEventListener('click', function() {
             const url = document.getElementById('session_url').value;
             if (url) {
                 window.open(url, '_blank');
             }
+        });
+
+        // Enhanced form interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to form elements
+            const formCards = document.querySelectorAll('.upload-card');
+            formCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 15px 35px rgba(0,0,0,0.15)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                });
+            });
+
+            // Enhanced external link handling for any external links
+            const externalLinks = document.querySelectorAll('a[href*="youtube.com"], a[href*="drive.google"], a[href*="meet.google"], a[href*="zoom.us"]');
+            externalLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    console.log(`🔗 Opening external link: ${url}`);
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                });
+            });
         });
     </script>
 </body>

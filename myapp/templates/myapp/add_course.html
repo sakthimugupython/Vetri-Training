@@ -1,5 +1,5 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,228 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body { background: #f4f6ff; }
+
+        /* Enhanced Hamburger Button for Add Course Page */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem !important;
+            font-size: 1.25rem !important;
+            cursor: pointer !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: none !important;
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #2980b9 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6) !important;
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Sidebar Close Button */
+        .sidebar-close {
+            position: fixed !important;
+            top: 1rem !important;
+            right: 1rem !important;
+            z-index: 1001 !important;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: none !important;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .sidebar-close:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6) !important;
+        }
+
+        .sidebar-close:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle, .sidebar-close {
+                display: none !important;
+            }
+        }
+
+        /* Mobile: Show hamburger prominently */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                width: 50px !important;
+                height: 50px !important;
+                box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            }
+
+            .sidebar.active ~ .sidebar-close {
+                display: block !important;
+            }
+        }
+
+        /* Enhanced Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #222e3a;
+            color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+        }
+
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0) !important;
+                z-index: 1000 !important;
+            }
+        }
+
+        /* Main Content - Enhanced Responsive */
+        .main-content {
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+
+            .course-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                margin-top: 4rem; /* Push below hamburger button */
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .course-title {
+                font-size: 1.5rem;
+            }
+
+            .course-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .user-info {
+                text-align: center;
+            }
+
+            /* Keep icons in single row on mobile */
+            .course-header .d-flex:last-child {
+                flex-direction: row !important;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .course-header .icon-btn {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            /* Responsive form container */
+            .add-course-container {
+                padding: 1.5rem;
+                margin: 1rem auto;
+                max-width: 100%;
+            }
+
+            .add-course-title {
+                font-size: 1.3rem;
+                margin-bottom: 1.5rem;
+            }
+
+            /* Stack form fields on mobile */
+            .row.g-3 .col-md-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            /* Responsive form elements */
+            .form-control, .form-select {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .add-btn {
+                width: 100%;
+                padding: 1rem;
+                font-size: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            /* Upload area responsive */
+            .upload-cover {
+                padding: 2rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .upload-cover-label {
+                font-size: 1rem;
+            }
+        }
+
+        /* Desktop responsive adjustments */
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+                padding: 2rem;
+                width: calc(100% - 280px);
+            }
+        }
+
+        /* Form styling */
         .add-course-container {
             background: #fff;
             border-radius: 16px;
@@ -78,8 +300,20 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Close Button (Mobile) -->
+    <button class="sidebar-close" onclick="toggleSidebar()">
+        <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Sidebar -->
     {% include 'myapp/_sidebar.html' %}
-    <div class="main-content" style="margin-left:240px;">
+
+    <div class="main-content">
         <div class="course-header" style="background:#3865ff;color:#fff;border-radius:0 0 6px 6px;padding:22px 32px 18px 32px;margin-bottom:18px;">
             <div>
                 <h3 class="course-title">Courses</h3>
@@ -156,6 +390,156 @@
             </form>
         </div>
     </div>
+
     {% include 'myapp/includes/course_success_popup.html' %}
+
+    <script>
+        // Enhanced hamburger functionality for Add Course Page
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            console.log('🍔 ADD COURSE HAMBURGER CLICKED!');
+            console.log('Sidebar found:', !!sidebar);
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Close button found:', !!closeBtn);
+            console.log('Window width:', window.innerWidth);
+
+            if (window.innerWidth <= 768) {
+                console.log('📱 Mobile mode detected');
+                console.log('Sidebar current transform:', sidebar.style.transform);
+                console.log('Sidebar current classList:', sidebar.classList.toString());
+
+                // Toggle the active class
+                const isActive = sidebar.classList.contains('active');
+                console.log('Currently active:', isActive);
+
+                if (isActive) {
+                    // Close sidebar
+                    sidebar.classList.remove('active');
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    console.log('🔒 Add Course: Sidebar CLOSED');
+                } else {
+                    // Open sidebar
+                    sidebar.classList.add('active');
+                    sidebar.style.transform = 'translateX(0)';
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                    console.log('🔓 Add Course: Sidebar OPENED');
+                }
+
+                console.log('Sidebar classList after toggle:', sidebar.classList.toString());
+                console.log('Sidebar transform after toggle:', sidebar.style.transform);
+            } else {
+                console.log('❌ Desktop mode - hamburger should be hidden');
+            }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768 &&
+                sidebar &&
+                toggleBtn &&
+                closeBtn &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target) &&
+                !closeBtn.contains(event.target)) {
+
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(-100%)';
+                toggleBtn.style.display = 'block';
+                closeBtn.style.display = 'none';
+                console.log('🚪 Add Course: Sidebar closed via outside click');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(0)';
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('💻 Add Course: Desktop view - sidebar always visible');
+            } else {
+                // On mobile, ensure hamburger is visible and sidebar hidden (unless active)
+                if (!sidebar.classList.contains('active')) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                }
+                console.log('📱 Add Course: Mobile view - hamburger/close button management');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            console.log('🚀 ADD COURSE PAGE INITIALIZING...');
+            console.log('Screen width:', window.innerWidth);
+
+            // Set initial state based on screen size
+            if (window.innerWidth <= 768) {
+                // MOBILE: Show hamburger, hide sidebar and close button
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('📱 Initial: Mobile mode - hamburger VISIBLE, sidebar HIDDEN');
+            } else {
+                // DESKTOP: Hide hamburger and close button, show sidebar
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('💻 Initial: Desktop mode - hamburger HIDDEN, sidebar VISIBLE');
+            }
+
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Close button found:', !!closeBtn);
+            console.log('Sidebar found:', !!sidebar);
+
+            // Force correct state after CSS loads
+            setTimeout(() => {
+                if (window.innerWidth <= 768) {
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    if (!sidebar.classList.contains('active')) {
+                        sidebar.style.transform = 'translateX(-100%)';
+                    }
+                    console.log('⏰ Force mobile state applied');
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    sidebar.style.transform = 'translateX(0)';
+                    console.log('⏰ Force desktop state applied');
+                }
+            }, 100);
+        });
+
+        // Add any interactive functionality here if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Add Course page loaded successfully');
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

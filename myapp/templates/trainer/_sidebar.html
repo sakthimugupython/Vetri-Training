@@ -7,13 +7,16 @@
     min-width: 220px;
     max-width: 240px;
     height: 100vh;
-    transition: transform 0.3s;
+    transition: transform 0.3s ease;
     box-shadow: 0 0 16px rgba(56,101,255,0.08);
     padding-top: 0.5rem;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
+    overflow-y: auto;
+    transform: translateX(0); /* Show by default on desktop */
+    width: 240px; /* Ensure consistent width */
 }
 .sidebar .logo {
     font-size: 2rem;
@@ -46,20 +49,73 @@
 .sidebar nav .nav-link i {
     font-size: 1.2rem;
 }
-.sidebar nav .nav-link:hover {
-    background: rgba(151, 71, 255, 0.2);
-    color: #fff;
+.sidebar nav .nav-link .badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+}
+
+/* Hide sidebar on mobile by default, but keep hamburger visible */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%); /* Hide on mobile by default */
+        width: 280px;
+    }
+
+    .sidebar.active {
+        transform: translateX(0) !important; /* Show when active - force override */
+        z-index: 1001; /* Ensure it's above everything */
+    }
+}
+
+.sidebar-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: none; /* Hidden by default */
+    z-index: 1003; /* Above everything */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Show close button when sidebar is active */
+.sidebar.active .sidebar-close {
+    display: block !important; /* Force show when active */
 }
 </style>
 
 <div class="sidebar d-flex flex-column">
+    <!-- Close button for mobile -->
+    <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Close sidebar">
+        <i class="fas fa-times"></i>
+    </button>
+
     <h2 class="logo fw-bold text-white text-center py-4">VTS <br><span style="font-weight:400;">Trainer</span></h2>
     <nav class="flex-grow-1">
         <a href="{% url 'trainer_dashboard' %}" class="nav-link{% if request.resolver_match.url_name == 'trainer_dashboard' %} active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
         <a href="{% url 'trainer_trainee_list' %}" class="nav-link{% if request.resolver_match.url_name == 'trainer_trainee_list' %} active{% endif %}"><i class="fas fa-users"></i> My Trainees</a>
         <a href="{% url 'trainer_trainee_attendance' %}" class="nav-link{% if request.resolver_match.url_name == 'trainer_trainee_attendance' %} active{% endif %}"><i class="fas fa-calendar-check"></i> Attendance</a>
         <a href="{% url 'session_list' %}" class="nav-link{% if request.resolver_match.url_name == 'session_list' %} active{% endif %}"><i class="fas fa-video"></i> Sessions</a>
-        <a href="{% url 'trainer_announcements' %}" class="nav-link{% if request.resolver_match.url_name == 'trainer_announcements' %} active{% endif %}"><i class="fas fa-bullhorn"></i> Announcements</a>
+        <a href="{% url 'trainer_announcements' %}" class="nav-link{% if request.resolver_match.url_name == 'trainer_announcements' %} active{% endif %}">
+            <i class="fas fa-bullhorn"></i> Announcements
+        </a>
+        <a href="{% url 'create_announcement' %}" class="nav-link{% if request.resolver_match.url_name == 'create_announcement' %} active{% endif %}">
+            <i class="fas fa-plus-circle"></i> Create Announcement
+        </a>
         <a href="{% url 'trainer_logout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </nav>
 </div>

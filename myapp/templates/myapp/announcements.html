@@ -1,179 +1,300 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
+{% csrf_token %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Announcements - Admin Portal</title>
+    <title>Manage Announcements</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/css/trainer_list.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            --card-shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+        /* Enhanced Hamburger Button for Announcements Page */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem !important;
+            font-size: 1.25rem !important;
+            cursor: pointer !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: none !important;
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
         }
 
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #2980b9 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6) !important;
         }
 
-        .main-content {
-            margin-left: 230px;
-            padding: 2rem;
-            min-height: 100vh;
-            background: #f8f9fa;
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
         }
 
-        /* Hero Header */
-        .hero-header {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 3rem 2rem;
-            border-radius: 20px;
-            margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
+        /* Sidebar Close Button */
+        .sidebar-close {
+            position: fixed !important;
+            top: 1rem !important;
+            right: 1rem !important;
+            z-index: 1001 !important;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: none !important;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important;
+            transition: all 0.3s ease !important;
         }
 
-        .hero-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
+        .sidebar-close:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6) !important;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+        .sidebar-close:active {
+            transform: scale(0.95) !important;
         }
 
-        .hero-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle, .sidebar-close {
+                display: none !important;
+            }
         }
 
-        .hero-subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 1rem;
+        /* Mobile: Show hamburger prominently */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                width: 50px !important;
+                height: 50px !important;
+                box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            }
+
+            .sidebar.active ~ .sidebar-close {
+                display: block !important;
+            }
         }
 
-        .hero-stats {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1.5rem;
-        }
-
-        .hero-stat {
-            text-align: center;
-        }
-
-        .hero-stat-number {
-            font-size: 2rem;
-            font-weight: 800;
+        /* Enhanced Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #222e3a;
             color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
         }
 
-        .hero-stat-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-top: 0.3rem;
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0) !important;
+                z-index: 1000 !important;
+            }
         }
 
-        /* Action Section */
-        .action-section {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        .section-title {
-            color: #2d3748;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-create {
-            background: var(--success-gradient);
-            border: none;
-            border-radius: 15px;
-            padding: 1rem 2rem;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        /* Main Content - Enhanced Responsive */
+        .main-content {
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            min-height: 100vh;
         }
 
-        .btn-create:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-            color: white;
-            text-decoration: none;
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+
+            .trainer-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                margin-top: 4rem; /* Push below hamburger button */
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .trainer-title {
+                font-size: 1.5rem;
+            }
+
+            .trainer-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .user-info {
+                text-align: center;
+            }
+
+            /* Keep icons in single row on mobile */
+            .trainer-header .d-flex:last-child {
+                flex-direction: row !important;
+                justify-content: center;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .trainer-header .fas {
+                padding: 0.5rem;
+                font-size: 1.2rem;
+            }
+
+            /* Responsive action buttons */
+            .d-flex.justify-content-end {
+                justify-content: center;
+                margin-bottom: 2rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+                border-radius: 8px;
+            }
+
+            /* Responsive announcement cards */
+            .announcement-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .announcement-card {
+                margin-bottom: 1.5rem;
+            }
+
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .card-footer {
+                padding: 1rem 1.5rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .card-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .card-actions .btn {
+                font-size: 0.8rem;
+                padding: 0.5rem 1rem;
+            }
+
+            /* Statistics cards responsive */
+            .row.g-3 .col-md-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+                margin-bottom: 1rem;
+            }
+
+            .trainer-stat-card {
+                padding: 1.5rem 1rem;
+                text-align: center;
+            }
+
+            .trainer-stat-card > div:nth-child(1) {
+                font-size: 2rem;
+            }
+
+            .trainer-stat-card > div:nth-child(2) {
+                font-size: 1rem;
+                line-height: 1.2;
+            }
+
+            .trainer-stat-card > div:nth-child(3) {
+                font-size: 1.5rem;
+            }
         }
 
-        /* Announcement Cards */
-        .announcement-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+        /* Desktop responsive adjustments */
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+                padding: 2rem;
+                width: calc(100% - 280px);
+            }
         }
 
+        /* Statistics cards responsive for small screens */
+        @media (max-width: 576px) {
+            .row.g-3 .col-md-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* Global overflow prevention */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Ensure all elements respect boundaries */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Enhanced card styling */
         .announcement-card {
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            margin-bottom: 1.5rem;
         }
 
         .announcement-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
             border-color: #667eea;
         }
 
         .card-header {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 1.5rem;
             position: relative;
-        }
-
-        .card-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--secondary-gradient);
         }
 
         .card-title {
@@ -185,23 +306,8 @@
             gap: 0.5rem;
         }
 
-        .card-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
         .card-content {
             padding: 2rem;
-        }
-
-        .announcement-text {
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
         }
 
         .card-footer {
@@ -213,29 +319,63 @@
             align-items: center;
         }
 
-        .btn-edit {
-            background: var(--primary-gradient);
-            border: none;
-            border-radius: 10px;
-            padding: 0.6rem 1.2rem;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-edit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-
-        .announcement-badges {
+        .card-actions {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
 
+        .card-actions .btn {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .card-timestamp {
+            font-size: 0.8rem;
+        }
+
+        /* Statistics cards */
+        .trainer-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .trainer-stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .trainer-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .trainer-stat-card > div:nth-child(1) {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .trainer-stat-card > div:nth-child(2) {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .trainer-stat-card > div:nth-child(3) {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        /* Badge styling */
         .badge {
             padding: 0.4rem 0.8rem;
             border-radius: 12px;
@@ -243,253 +383,344 @@
             font-weight: 600;
         }
 
-        .badge-admin {
-            background: var(--primary-gradient);
+        .badge-new {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
+            font-size: 0.7rem;
+            animation: pulse 2s infinite;
         }
 
-        .badge-category {
-            background: var(--secondary-gradient);
-            color: white;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            color: #a0aec0;
-            margin-bottom: 1.5rem;
-        }
-
-        .empty-title {
-            font-size: 1.8rem;
-            color: #2d3748;
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-
-        .empty-text {
-            color: #718096;
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            .hero-header {
-                padding: 2rem 1rem;
-            }
-
-            .hero-title {
-                font-size: 2rem;
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .hero-stats {
-                justify-content: center;
-            }
-
-            .action-section {
-                padding: 1.5rem;
-            }
-
-            .section-title {
-                font-size: 1.3rem;
-            }
-
-            .announcement-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .card-meta {
-                flex-direction: column;
-                gap: 0.5rem;
-                text-align: center;
-            }
-
-            .card-footer {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar Toggle for Mobile -->
-    <button class="sidebar-toggle d-lg-none" aria-label="Toggle sidebar" style="position:fixed;top:18px;left:18px;z-index:200;background:none;border:none;font-size:2rem;color:#667eea;">
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
     </button>
 
-    <div class="d-flex">
-        {% include 'myapp/_sidebar.html' %}
+    <!-- Sidebar Close Button (Mobile) -->
+    <button class="sidebar-close" onclick="toggleSidebar()">
+        <i class="fas fa-times"></i>
+    </button>
 
-        <div class="main-content w-100">
-            <!-- Hero Header -->
-            <div class="hero-header">
-                <div class="hero-title">
-                    <i class="fas fa-bullhorn"></i>
-                    {% if can_create %}
-                        Announcements Management
-                    {% else %}
-                        Announcements
-                    {% endif %}
-                </div>
-                <div class="hero-subtitle">
-                    {% if can_create %}
-                        Manage and broadcast important updates across the platform
-                    {% else %}
-                        Stay updated with important announcements from your trainers and administrators
-                    {% endif %}
+    <!-- Sidebar -->
+    {% include 'myapp/_sidebar.html' %}
+
+    <div class="main-content">
+        <div class="trainer-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h3 class="trainer-title">Manage Announcements</h3>
+                <div class="trainer-subtitle">Create, edit, and manage all announcements for trainees and trainers.</div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-envelope"></i>
+                <i class="fas fa-bell"></i>
+                <div class="user-info ms-2">
+                    <div class="user-role"><span style="font-size:0.95em;color:#8ec3ff;">VTS Admin</span></div>
                 </div>
             </div>
+        </div>
 
-            {% if can_create %}
-            <div class="action-section">
-                <div class="section-title">
-                    <i class="fas fa-plus-circle"></i>
-                    Create New Announcement
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <p class="mb-0 text-muted">Share important updates, events, and news with all users</p>
-                    <a href="{% url 'add_announcement' %}" class="btn-create">
-                        <i class="fas fa-plus"></i>
-                        Create Announcement
-                    </a>
+        <!-- Statistics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="trainer-stat-card">
+                    <div><i class="fas fa-bullhorn"></i></div>
+                    <div>Total Announcements</div>
+                    <div>{{ total_announcements }}</div>
                 </div>
             </div>
-            {% endif %}
+            <div class="col-md-3">
+                <div class="trainer-stat-card">
+                    <div><i class="fas fa-users"></i></div>
+                    <div>For Trainees</div>
+                    <div>{{ trainee_announcements }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="trainer-stat-card">
+                    <div><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div>For Trainers</div>
+                    <div>{{ trainer_announcements_count }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="trainer-stat-card">
+                    <div><i class="fas fa-globe"></i></div>
+                    <div>For Everyone</div>
+                    <div>{{ general_announcements }}</div>
+                </div>
+            </div>
+        </div>
 
-            <!-- Announcements Grid -->
-            {% if announcements %}
-                <div class="announcement-grid">
-                    {% for announcement in announcements %}
-                    <div class="announcement-card">
-                        <div class="card-header">
-                            <h4 class="card-title">
-                                <i class="fas fa-megaphone"></i>
-                                {{ announcement.title }}
-                            </h4>
-                            <div class="card-meta">
-                                <div>
-                                    <i class="fas fa-calendar me-1"></i>
-                                    {{ announcement.date_posted|date:'M d, Y' }}
-                                </div>
-                                <div>
-                                    <i class="fas fa-user me-1"></i>
-                                    {{ announcement.posted_by }}
-                                </div>
-                            </div>
-                        </div>
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end mb-4">
+            <a href="{% url 'add_announcement' %}" class="btn btn-primary" style="background:linear-gradient(90deg,#a259ff 0%,#38b6ff 100%);color:#fff;font-weight:600;font-size:1.1rem;padding:10px 32px;border-radius:8px;box-shadow:0 2px 8px rgba(56,101,255,0.08);">
+                <i class="fas fa-plus me-2"></i>Add New Announcement
+            </a>
+        </div>
 
-                        <div class="card-content">
-                            {% if announcement.short_description %}
-                            <p class="text-muted mb-3" style="font-style: italic; color: #718096;">
-                                {{ announcement.short_description }}
-                            </p>
+        <!-- Announcements Grid -->
+        {% if announcements %}
+            <div class="announcement-grid">
+                {% for announcement in announcements %}
+                <div class="announcement-card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-megaphone"></i>
+                            {{ announcement.title }}
+                            {% if forloop.counter <= 3 %}
+                                <span class="badge badge-new ms-2">Latest</span>
                             {% endif %}
+                        </h4>
+                    </div>
 
-                            <div class="announcement-text">
-                                {{ announcement.content|truncatechars:200 }}
-                            </div>
+                    <div class="card-content">
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">
+                                <i class="fas fa-info-circle me-2"></i>Summary
+                            </h6>
+                            <p class="text-muted">{{ announcement.short_description|truncatechars:150 }}</p>
                         </div>
 
-                        <div class="card-footer">
-                            <div class="announcement-badges">
-                                <span class="badge badge-admin">Admin Post</span>
-                                {% if announcement.category %}
-                                <span class="badge badge-category">{{ announcement.get_category_display }}</span>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">
+                                <i class="fas fa-file-alt me-2"></i>Content
+                            </h6>
+                            <div class="details-content">
+                                {{ announcement.content|linebreaksbr|truncatechars:200 }}
+                                {% if announcement.content|length > 200 %}
+                                    <a href="#" class="text-primary text-decoration-none ms-2">Read more...</a>
                                 {% endif %}
                             </div>
+                        </div>
 
-                            <a href="{% url 'edit_announcement' announcement.id %}" class="btn-edit">
-                                <i class="fas fa-edit me-1"></i>Edit
-                            </a>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">
+                                <i class="fas fa-bullhorn me-2"></i>Audience
+                            </h6>
+                            <div>
+                                {% if announcement.target_audience == 'trainees' %}
+                                    <span class="badge bg-success">Students</span>
+                                {% elif announcement.target_audience == 'trainers' %}
+                                    <span class="badge bg-primary">Trainers</span>
+                                {% else %}
+                                    <span class="badge bg-info">Everyone</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-bullhorn"></i>
+
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="card-actions">
+                                <a href="{% url 'edit_announcement' announcement.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement({{ announcement.id }})">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                            <div class="card-timestamp">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ announcement.date_posted|date:'M d, Y' }} at {{ announcement.date_posted|time:'h:i A' }}
+                                </small>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="empty-title">
-                        {% if can_create %}
-                            No Announcements Yet
-                        {% else %}
-                            No Announcements Available
-                        {% endif %}
-                    </h3>
-                    <p class="empty-text">
-                        {% if can_create %}
-                            Start creating announcements to keep everyone informed about important updates and events.
-                        {% else %}
-                            No announcements are available at the moment. Check back later for updates from your trainers and administrators.
-                        {% endif %}
-                    </p>
-                    {% if can_create %}
-                    <a href="{% url 'add_announcement' %}" class="btn-create">
-                        <i class="fas fa-plus me-2"></i>Create Your First Announcement
-                    </a>
-                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div style="font-size: 4rem; color: #a0aec0; margin-bottom: 1.5rem;">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3 style="color: #2d3748; margin-bottom: 1rem;">No Announcements Yet</h3>
+                <p style="color: #718096; margin-bottom: 2rem;">Create your first announcement to communicate with trainees and trainers.</p>
+                <a href="{% url 'add_announcement' %}" class="btn btn-primary" style="background:linear-gradient(90deg,#a259ff 0%,#38b6ff 100%);color:#fff;font-weight:600;padding:12px 24px;border-radius:8px;">
+                    <i class="fas fa-plus me-2"></i>Create First Announcement
+                </a>
+            </div>
+        {% endif %}
     </div>
 
     <script>
-        // Sidebar toggle for mobile
+        // Enhanced hamburger functionality for Announcements Page
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            console.log('🍔 ANNOUNCEMENTS HAMBURGER CLICKED!');
+            console.log('Sidebar found:', !!sidebar);
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Close button found:', !!closeBtn);
+            console.log('Window width:', window.innerWidth);
+
+            if (window.innerWidth <= 768) {
+                console.log('📱 Mobile mode detected');
+                console.log('Sidebar current transform:', sidebar.style.transform);
+                console.log('Sidebar current classList:', sidebar.classList.toString());
+
+                // Toggle the active class
+                const isActive = sidebar.classList.contains('active');
+                console.log('Currently active:', isActive);
+
+                if (isActive) {
+                    // Close sidebar
+                    sidebar.classList.remove('active');
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    console.log('🔒 Announcements: Sidebar CLOSED');
+                } else {
+                    // Open sidebar
+                    sidebar.classList.add('active');
+                    sidebar.style.transform = 'translateX(0)';
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                    console.log('🔓 Announcements: Sidebar OPENED');
+                }
+
+                console.log('Sidebar classList after toggle:', sidebar.classList.toString());
+                console.log('Sidebar transform after toggle:', sidebar.style.transform);
+            } else {
+                console.log('❌ Desktop mode - hamburger should be hidden');
+            }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768 &&
+                sidebar &&
+                toggleBtn &&
+                closeBtn &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target) &&
+                !closeBtn.contains(event.target)) {
+
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(-100%)';
+                toggleBtn.style.display = 'block';
+                closeBtn.style.display = 'none';
+                console.log('🚪 Announcements: Sidebar closed via outside click');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(0)';
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('💻 Announcements: Desktop view - sidebar always visible');
+            } else {
+                // On mobile, ensure hamburger is visible and sidebar hidden (unless active)
+                if (!sidebar.classList.contains('active')) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                }
+                console.log('📱 Announcements: Mobile view - hamburger/close button management');
+            }
+        });
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
 
-            if (sidebar && toggleBtn) {
-                function closeSidebar() {
-                    sidebar.style.transform = 'translateX(-100%)';
-                }
+            console.log('🚀 ANNOUNCEMENTS PAGE INITIALIZING...');
+            console.log('Screen width:', window.innerWidth);
 
-                function openSidebar() {
-                    sidebar.style.transform = 'translateX(0)';
-                }
-
-                function checkWidth() {
-                    if (window.innerWidth < 992) {
-                        closeSidebar();
-                        toggleBtn.style.display = 'block';
-                    } else {
-                        sidebar.style.transform = '';
-                        toggleBtn.style.display = 'none';
-                    }
-                }
-
-                checkWidth();
-                toggleBtn.addEventListener('click', function() {
-                    if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)') {
-                        closeSidebar();
-                    } else {
-                        openSidebar();
-                    }
-                });
-                window.addEventListener('resize', checkWidth);
+            // Set initial state based on screen size
+            if (window.innerWidth <= 768) {
+                // MOBILE: Show hamburger, hide sidebar and close button
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('📱 Initial: Mobile mode - hamburger VISIBLE, sidebar HIDDEN');
+            } else {
+                // DESKTOP: Hide hamburger and close button, show sidebar
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+                console.log('💻 Initial: Desktop mode - hamburger HIDDEN, sidebar VISIBLE');
             }
+
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Close button found:', !!closeBtn);
+            console.log('Sidebar found:', !!sidebar);
+
+            // Force correct state after CSS loads
+            setTimeout(() => {
+                if (window.innerWidth <= 768) {
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    if (!sidebar.classList.contains('active')) {
+                        sidebar.style.transform = 'translateX(-100%)';
+                    }
+                    console.log('⏰ Force mobile state applied');
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                    sidebar.style.transform = 'translateX(0)';
+                    console.log('⏰ Force desktop state applied');
+                }
+            }, 100);
+        });
+
+        function deleteAnnouncement(announcementId) {
+            if (confirm('Are you sure you want to delete this announcement?')) {
+                // Create a form to submit the delete request
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/announcements/${announcementId}/delete/`;
+
+                // Add CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = csrfToken.value;
+                    form.appendChild(csrfInput);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Add any interactive functionality here if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Admin Announcements page loaded successfully');
         });
     </script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

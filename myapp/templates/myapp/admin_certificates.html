@@ -7,6 +7,7 @@
     <title>Certificate Management - Admin Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'myapp/css/admin_dashboard.css' %}">
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -17,60 +18,271 @@
             --card-shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
         }
 
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* Admin Dashboard Styles */
+        body { background: #f5f7ff; }
+        .sidebar {
+            background: #222e3a;
+            color: #fff;
             min-height: 100vh;
+            width: 230px;
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            z-index: 100;
+        }
+        .sidebar .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 32px 0 24px 0;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .sidebar .logo span { color: #52fe97; font-style: italic; }
+        .sidebar .nav-link {
+            color: #b6c6d6;
+            font-size: 1.08rem;
+            padding: 12px 32px;
+            border-radius: 8px 0 0 8px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar .nav-link.active, .sidebar .nav-link:hover {
+            background: #3865ff;
+            color: #fff;
+        }
+        .sidebar .nav-link i { margin-right: 12px; }
+        .main-content { margin-left: 230px; padding: 0 24px 24px 24px; }
+
+        /* Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #222e3a;
+            color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0); /* Show by default on desktop */
         }
 
-        .main-content {
-            margin-left: 230px;
-            padding: 2rem;
-            min-height: 100vh;
-            background: #f8f9fa;
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%); /* Hide by default on mobile */
+                transition: transform 0.3s ease;
+                width: 280px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0) !important; /* Show when active */
+                z-index: 1000 !important;
+            }
         }
 
-        /* Hero Header */
+        /* Desktop main content */
+        @media (min-width: 992px) {
+            .main-content {
+                margin-left: 230px;
+                padding: 0 24px 24px 24px;
+                position: relative;
+                z-index: 10;
+                min-height: 100vh;
+            }
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 300px;
+                width: 100%;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .certificates-table-container {
+                font-size: 0.9rem;
+            }
+
+            .certificates-table th,
+            .certificates-table td {
+                padding: 0.8rem 0.5rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .grade-distribution {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .course-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        /* Enhanced Hero Header */
         .hero-header {
-            background: var(--primary-gradient);
+            background: #3867ff;
             color: white;
-            padding: 3rem 2rem;
-            border-radius: 20px;
+            padding: 2rem 1.5rem;
             margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 20px 40px rgba(56, 103, 255, 0.3);
             position: relative;
             overflow: hidden;
-        }
-
-        .hero-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .hero-title {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            from {
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            }
         }
 
-        .hero-subtitle {
+        /* Enhanced Form Container */
+        .content-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Enhanced Form Styling */
+        .form-label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-select, .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .form-select:hover, .form-control:hover {
+            border-color: #b794f6;
+        }
+
+        /* Enhanced Generate Button */
+        .btn-generate {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-generate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-generate:hover::before {
+            left: 100%;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        .btn-generate i {
+            margin-right: 0.5rem;
             font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 0;
+        }
+
+        /* Enhanced Section Titles */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .section-title i {
+            color: #667eea;
+            font-size: 1.8rem;
         }
 
         /* Stats Cards */
@@ -96,8 +308,35 @@
             box-shadow: var(--card-shadow-hover);
         }
 
+        /* Enhanced Download Button */
+        .btn-download {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-download i {
+            font-size: 0.9rem;
+        }
+
         .stat-icon {
-            font-size: 3rem;
             margin-bottom: 1rem;
             opacity: 0.8;
         }
@@ -115,29 +354,10 @@
             font-weight: 600;
         }
 
-        /* Main Content Sections */
-        .content-section {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        .section-title {
-            color: #2d3748;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
         /* Grade Distribution */
         .grade-distribution {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -196,44 +416,91 @@
             color: var(--success-gradient);
         }
 
-        /* Certificate Table */
+        /* Enhanced Certificate Table */
         .certificates-table-container {
             overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background: white;
         }
 
         .certificates-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-top: 1rem;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .certificates-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .certificates-table th {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1rem;
+            padding: 1.5rem 1rem;
             text-align: left;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             border: none;
+            position: relative;
+        }
+
+        .certificates-table th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .certificates-table th:last-child {
+            border-top-right-radius: 15px;
         }
 
         .certificates-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .certificates-table tbody tr {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
         }
 
         .certificates-table tbody tr:hover {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            border-left-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
         }
 
+        .certificates-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .certificates-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .certificates-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        /* Enhanced Table Elements */
         .student-name {
-            font-weight: 600;
+            font-weight: 700;
             color: #2d3748;
+            font-size: 1rem;
         }
 
         .course-name {
             color: #4a5568;
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .certificate-number {
@@ -297,13 +564,12 @@
             text-decoration: none;
         }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
+        .main-content {
+            margin-left: 300px;
+            padding: 1rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+            transition: var(--transition);
         }
 
         .empty-icon {
@@ -325,172 +591,234 @@
             margin-bottom: 2rem;
         }
 
-        /* Mobile Responsive */
+        /* Enhanced Hamburger Button for Admin Dashboard */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important; /* Purple to blue gradient */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem !important;
+            font-size: 1.25rem !important;
+            cursor: pointer !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: none !important; /* Hidden by default - only show on mobile */
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #2980b9 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6) !important;
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Mobile: Show hamburger prominently */
         @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                width: 50px !important;
+                height: 50px !important;
+                box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
             }
+        /* Sidebar Close Button */
+        .sidebar-close {
+            position: fixed !important;
+            top: 1rem !important;
+            right: 1rem !important;
+            z-index: 1001 !important;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important; /* Red gradient */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: none !important;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important;
+            transition: all 0.3s ease !important;
+        }
 
-            .hero-header {
-                padding: 2rem 1rem;
-            }
+        .sidebar-close:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6) !important;
+        }
 
-            .hero-title {
-                font-size: 2rem;
-                flex-direction: column;
-                text-align: center;
-            }
+        .sidebar-close:active {
+            transform: scale(0.95) !important;
+        }
 
-            .stats-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
+        .main-content {
+            margin-left: 0px;
+            padding: 1rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+            transition: var(--transition);
+        }
 
-            .content-section {
-                padding: 1.5rem;
-            }
 
-            .grade-distribution {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1rem;
-            }
-
-            .course-stats {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .certificates-table-container {
-                font-size: 0.9rem;
-            }
-
-            .certificates-table th,
-            .certificates-table td {
-                padding: 0.8rem 0.5rem;
+        /* Show close button when sidebar is active on mobile */
+        @media (max-width: 768px) {
+            .sidebar.active ~ .sidebar-close {
+                display: block !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar Toggle for Mobile -->
-    <button class="sidebar-toggle d-lg-none" aria-label="Toggle sidebar" style="position:fixed;top:18px;left:18px;z-index:200;background:none;border:none;font-size:2rem;color:#667eea;">
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
     </button>
 
-    <div class="d-flex">
-        {% include 'myapp/_sidebar.html' %}
+    <!-- Sidebar Close Button (Mobile) -->
+    <button class="sidebar-close" onclick="toggleSidebar()">
+        <i class="fas fa-times"></i>
+    </button>
 
-        <div class="main-content">
+    <!-- Sidebar -->
+    {% include 'myapp/_sidebar.html' %}
+
+    <div class="main-content">
             <!-- Hero Header -->
             <div class="hero-header">
                 <div class="hero-title">
                     <i class="fas fa-certificate"></i>
-                    Certificate Management
+Certificate Management
                 </div>
                 <div class="hero-subtitle">
                     Monitor and manage all certificates issued across the platform
                 </div>
             </div>
 
-            <!-- Statistics Cards -->
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--primary-gradient);">
-                        <i class="fas fa-certificate"></i>
-                    </div>
-                    <div class="stat-number">{{ total_certificates }}</div>
-                    <div class="stat-label">Total Certificates</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--success-gradient);">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-number">{{ verified_certificates }}</div>
-                    <div class="stat-label">Verified</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--warning-gradient);">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-number">{{ pending_certificates }}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--secondary-gradient);">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="stat-number">{{ course_stats|length }}</div>
-                    <div class="stat-label">Active Courses</div>
-                </div>
-            </div>
-
-            <!-- Grade Distribution -->
+            <!-- Generate Certificate Form -->
             <div class="content-section">
                 <div class="section-title">
-                    <i class="fas fa-chart-bar"></i>
-                    Grade Distribution
+                    <i class="fas fa-plus-circle"></i>
+                    Generate New Certificate
                 </div>
-                <div class="grade-distribution">
-                    <div class="grade-card">
-                        <div class="grade-letter">A</div>
-                        <div class="grade-count">{{ grade_distribution.A }}</div>
-                    </div>
-                    <div class="grade-card">
-                        <div class="grade-letter">B</div>
-                        <div class="grade-count">{{ grade_distribution.B }}</div>
-                    </div>
-                    <div class="grade-card">
-                        <div class="grade-letter">C</div>
-                        <div class="grade-count">{{ grade_distribution.C }}</div>
-                    </div>
-                    <div class="grade-card">
-                        <div class="grade-letter">D</div>
-                        <div class="grade-count">{{ grade_distribution.D }}</div>
-                    </div>
-                    <div class="grade-card">
-                        <div class="grade-letter">F</div>
-                        <div class="grade-count">{{ grade_distribution.F }}</div>
-                    </div>
-                </div>
-            </div>
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="generate">
 
-            <!-- Course Statistics -->
-            <div class="content-section">
+                    <div class="col-md-3">
+                        <label for="trainee_id" class="form-label">Select Trainee</label>
+                        <select class="form-select" id="trainee_id" name="trainee_id" required>
+                            <option value="">Choose a trainee...</option>
+                            {% for trainee in trainees %}
+                                <option value="{{ trainee.id }}">{{ trainee.user.get_full_name|default:trainee.user.username }} - {{ trainee.course.name|default:'No Course' }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="course_id" class="form-label">Select Course</label>
+                        <select class="form-select" id="course_id" name="course_id" required>
+                            <option value="">Choose a course...</option>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }} ({{ course.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label for="completion_percentage" class="form-label">Completion %</label>
+                        <input type="number" class="form-control" id="completion_percentage" name="completion_percentage"
+                               min="0" max="100" value="100">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label for="grade" class="form-label">Grade</label>
+                        <select class="form-select" id="grade" name="grade">
+                            <option value="A">A (Excellent)</option>
+                            <option value="B">B (Good)</option>
+                            <option value="C">C (Satisfactory)</option>
+                            <option value="D">D (Needs Improvement)</option>
+                            <option value="F">F (Fail)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-generate w-100">
+                            <i class="fas fa-magic"></i>Generate
+                        </button>
+                    </div>
+                </form>
+            <!-- Certificate Template Upload -->
+            <div class="content-section mt-4    ">
                 <div class="section-title">
-                    <i class="fas fa-book"></i>
-                    Certificates by Course
+                    <i class="fas fa-upload"></i>
+                    Certificate Template Management
                 </div>
-                {% if course_stats %}
-                    <div class="course-stats">
-                        {% for course in course_stats %}
-                        <div class="course-stat-card">
-                            <div class="course-name">{{ course.name }}</div>
-                            <div class="course-code">Code: {{ course.code }}</div>
-                            <div class="course-cert-count">{{ course.count }}</div>
-                            <div style="font-size: 0.9rem; color: #718096;">Certificates Issued</div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="template-info">
+                            <h6>Current Template Status</h6>
+                            <p class="text-muted">
+                                {% if template_exists %}
+                                    <span class="text-success">✓ Certificate template is uploaded and ready to use.</span>
+                                {% else %}
+                                    <span class="text-warning">⚠ No certificate template found. Using basic fallback design.</span>
+                                {% endif %}
+                            </p>
+                            {% if current_template %}
+                                <small class="text-muted">Current template: {{ current_template }}</small>
+                            {% endif %}
                         </div>
-                        {% endfor %}
                     </div>
-                {% else %}
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-book"></i>
+                    <div class="col-md-4">
+                        <form method="post" enctype="multipart/form-data" class="d-flex gap-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="upload_template">
+                            <div class="flex-grow-1">
+                                <input type="file" class="form-control" name="template_file" accept="image/*" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                        </form>
+                        <div class="mt-2">
+                            <form method="post" style="display: inline;" onsubmit="return confirm('This will regenerate all existing certificates with the new format. Continue?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="regenerate_all">
+                                <button type="submit" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-sync"></i> Regenerate All
+                                </button>
+                            </form>
                         </div>
-                        <h3 class="empty-title">No Course Data</h3>
-                        <p class="empty-text">No certificates have been issued for any courses yet.</p>
                     </div>
-                {% endif %}
+                </div>
             </div>
-
-            <!-- Recent Certificates -->
             <div class="content-section">
                 <div class="section-title">
                     <i class="fas fa-list"></i>
-                    All Certificates
+                    Certificate Management
                 </div>
 
                 {% if certificates %}
@@ -498,45 +826,67 @@
                         <table class="certificates-table">
                             <thead>
                                 <tr>
-                                    <th>Student</th>
-                                    <th>Course</th>
-                                    <th>Certificate #</th>
-                                    <th>Grade</th>
-                                    <th>Progress</th>
+                                    <th>S.No</th>
+                                    <th>Trainee Name</th>
+                                    <th>Course Name</th>
+                                    <th>Certificate ID</th>
+                                    <th>Issue Date</th>
                                     <th>Status</th>
-                                    <th>Issued Date</th>
+                                    <th>Completion</th>
+                                    <th>Grade</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for certificate in certificates %}
+                                {% for cert_data in certificates %}
                                 <tr>
+                                    <td><strong>{{ cert_data.sno }}</strong></td>
                                     <td>
-                                        <div class="student-name">{{ certificate.trainee.user.get_full_name|default:certificate.trainee.user.username }}</div>
-                                        <div class="course-name">{{ certificate.trainee.course.name|default:"No Course" }}</div>
-                                    </td>
-                                    <td>{{ certificate.course.name }}</td>
-                                    <td>
-                                        <span class="certificate-number">{{ certificate.certificate_number }}</span>
+                                        <div class="fw-bold">{{ cert_data.trainee_name }}</div>
+                                        <small class="text-muted">{{ cert_data.certificate.trainee.batch|default:'No Batch' }}</small>
                                     </td>
                                     <td>
-                                        <span class="grade-badge grade-{{ certificate.grade }}">{{ certificate.grade }}</span>
+                                        <span class="fw-semibold">{{ cert_data.course_name }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ cert_data.certificate.course.code|default:'N/A' }}</small>
                                     </td>
-                                    <td>{{ certificate.completion_percentage }}%</td>
                                     <td>
-                                        <span class="status-badge {% if certificate.is_verified %}status-verified{% else %}status-pending{% endif %}">
-                                            {% if certificate.is_verified %}
-                                                <i class="fas fa-check"></i> Verified
-                                            {% else %}
-                                                <i class="fas fa-clock"></i> Pending
-                                            {% endif %}
+                                        <code class="certificate-number">{{ cert_data.certificate_id }}</code>
+                                    </td>
+                                    <td>
+                                        <div>{{ cert_data.issue_date|date:"M d, Y" }}</div>
+                                        <small class="text-muted">{{ cert_data.issue_date|date:"M d, Y" }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {% if cert_data.status == 'Verified' %}status-verified{% else %}status-pending{% endif %}">
+                                            {{ cert_data.status }}
                                         </span>
                                     </td>
-                                    <td>{{ certificate.issued_date|date:'M d, Y' }}</td>
                                     <td>
-                                        <a href="#" class="btn-view">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
+                                        <div class="progress" style="width: 80px; height: 6px;">
+                                            <div class="progress-bar bg-success" role="progressbar"
+                                                 style="width: {{ cert_data.completion_percentage }}%">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted ms-2">{{ cert_data.completion_percentage }}%</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary fs-6">{{ cert_data.grade }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <a href="{% url 'download_certificate' cert_data.certificate.id %}" class="btn btn-sm btn-download" target="_blank">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                            <form method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this certificate?')">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="certificate_id" value="{{ cert_data.certificate.id }}">
+                                                <button type="submit" class="btn btn-sm btn-action">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -550,7 +900,7 @@
                         </div>
                         <h3 class="empty-title">No Certificates Yet</h3>
                         <p class="empty-text">No certificates have been issued in the system yet.</p>
-                        <p class="empty-text">Certificates are automatically generated when students complete courses with 80%+ progress.</p>
+                        <p class="empty-text">Use the form above to generate your first certificate.</p>
                     </div>
                 {% endif %}
             </div>
@@ -558,39 +908,89 @@
     </div>
 
     <script>
-        // Sidebar toggle for mobile
+        // Enhanced hamburger functionality for Admin Dashboard
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768) {
+                const isActive = sidebar.classList.contains('active');
+
+                if (isActive) {
+                    // Close sidebar
+                    sidebar.classList.remove('active');
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                } else {
+                    // Open sidebar
+                    sidebar.classList.add('active');
+                    sidebar.style.transform = 'translateX(0)';
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                }
+            }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768 &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target) &&
+                !closeBtn?.contains(event.target)) {
+
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(-100%)';
+                toggleBtn.style.display = 'block';
+                closeBtn.style.display = 'none';
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(0)';
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+            } else {
+                if (!sidebar.classList.contains('active')) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                }
+            }
+        });
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
 
-            if (sidebar && toggleBtn) {
-                function closeSidebar() {
-                    sidebar.style.transform = 'translateX(-100%)';
-                }
-
-                function openSidebar() {
-                    sidebar.style.transform = 'translateX(0)';
-                }
-
-                function checkWidth() {
-                    if (window.innerWidth < 992) {
-                        closeSidebar();
-                        toggleBtn.style.display = 'block';
-                    } else {
-                        sidebar.style.transform = '';
-                        toggleBtn.style.display = 'none';
-                    }
-                }
-
-                checkWidth();
-                toggleBtn.addEventListener('click', function() {
-                    if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)') {
-                        closeSidebar();
-                    } else {
-                        openSidebar();
-                    }
-                });
-                window.addEventListener('resize', checkWidth);
+            if (window.innerWidth <= 768) {
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                if (closeBtn) closeBtn.style.display = 'none';
+            } else {
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
             }
         });
     </script>

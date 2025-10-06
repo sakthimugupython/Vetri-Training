@@ -1,0 +1,823 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements - Student Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --card-shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        body {
+    
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden; /* Prevent horizontal scrolling globally */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .main-content {
+            margin-left: 230px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Desktop Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 230px;
+            background: #23243a;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 16px rgba(56,101,255,0.08);
+            padding-top: 0.5rem;
+        }
+
+        .sidebar .logo {
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0 1.2rem;
+        }
+
+        .sidebar nav .nav-link {
+            color: #fff;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 1rem;
+            margin-bottom: 2px;
+            transition: background 0.2s, font-weight 0.2s;
+            text-decoration: none;
+        }
+
+        .sidebar nav .nav-link.active {
+            background: #9747FF;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(151,71,255,0.12);
+        }
+
+        .sidebar nav .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar nav .nav-link:hover {
+            background: rgba(151, 71, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Mobile Sidebar Styles */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 280px;
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                transition: margin-left 0.3s ease;
+            }
+
+            /* Add backdrop overlay */
+            .sidebar.active::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: -1;
+            }
+
+            /* Prevent horizontal scrolling on mobile */
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            /* Mobile responsive adjustments */
+            .hero-header {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .action-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .announcement-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .card-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .card-footer {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        /* Hero Header */
+        .hero-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        /* Announcement Cards */
+        .announcement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .announcement-summary {
+            background: linear-gradient(135deg, #f7f9fc 0%, #e8f2ff 100%);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .summary-title {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-text {
+            color: #4a5568;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .announcement-details {
+            margin-bottom: 1rem;
+        }
+
+        .details-title {
+            color: #2d3748;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .details-content {
+            color: #4a5568;
+            line-height: 1.7;
+            font-size: 0.95rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .details-content p {
+            margin-bottom: 1rem;
+        }
+
+        .details-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .read-more-btn {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .read-more-btn:hover {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .announcement-audience {
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid var(--success-color);
+        }
+
+        .audience-label {
+            color: #495057;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .card-actions .btn {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .card-timestamp {
+            font-size: 0.8rem;
+        }
+
+        /* Enhanced card styling */
+        .announcement-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: #667eea;
+        }
+
+        .card-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--secondary-gradient);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card-footer {
+            background: #f7fafc;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background: linear-gradient(135deg, var(--success-color) 0%, #00C851 100%);
+            color: white;
+            font-size: 0.7rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #a0aec0;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .empty-text {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 280px;
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                transition: margin-left 0.3s ease;
+            }
+
+            /* Add backdrop overlay */
+            .sidebar.active::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: -1;
+            }
+
+            /* Prevent horizontal scrolling on mobile */
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            .hero-header {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .action-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .announcement-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .card-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .card-footer {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <h2 class="logo fw-bold text-white text-center py-4">Vetri <br><span style="font-weight:400;">Training</span></h2>
+        <nav class="flex-grow-1">
+            <a href="{% url 'trainee_dashboard' %}" class="nav-link{% if request.resolver_match.url_name == 'trainee_dashboard' %} active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{% url 'my_courses' %}" class="nav-link{% if request.resolver_match.url_name == 'my_courses' %} active{% endif %}"><i class="fas fa-graduation-cap"></i> My Courses</a>
+            <a href="{% url 'student_certificates' %}" class="nav-link{% if request.resolver_match.url_name == 'student_certificates' %} active{% endif %}"><i class="fas fa-certificate"></i> My Certificates</a>
+            <a href="{% url 'trainee_announcements' %}" class="nav-link{% if request.resolver_match.url_name == 'trainee_announcements' %} active{% endif %}"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="{% url 'student_logout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <div class="hero-title">
+                <i class="fas fa-bullhorn"></i>
+                Student Announcements
+            </div>
+            <div class="hero-subtitle">
+                Stay updated with important announcements and updates from your trainers and academy
+                <div class="text-muted mt-1">
+                    <i class="fas fa-sort-amount-down me-1"></i>
+                    Latest announcements appear first
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="action-section">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="section-title">
+                        <i class="fas fa-eye"></i>
+                        Recent Announcements
+                    </div>
+                    <p class="text-muted mb-4">View all announcements relevant to students and stay informed about important updates.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    {% if announcements %}
+                        <button type="button" class="btn btn-outline-secondary" onclick="markAllAsRead()">
+                            <i class="fas fa-check-double me-2"></i>Mark All as Read
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Announcements Grid -->
+        {% if announcements %}
+            <div class="announcement-grid">
+                {% for announcement in announcements %}
+                <div class="announcement-card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-megaphone"></i>
+                            {{ announcement.title }}
+                            {% if forloop.counter <= 3 %}
+                                <span class="badge badge-new ms-2">Latest</span>
+                            {% endif %}
+                        </h4>
+                        <div class="card-meta">
+                            <div>
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ announcement.date_posted|date:'M d, Y' }}
+                            </div>
+                            <div>
+                                <i class="fas fa-user me-1"></i>
+                                {{ announcement.posted_by }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-content">
+                        {% if announcement.short_description %}
+                        <div class="announcement-summary">
+                            <h6 class="summary-title">
+                                <i class="fas fa-info-circle me-2"></i>Summary
+                            </h6>
+                            <p class="summary-text">{{ announcement.short_description }}</p>
+                        </div>
+                        {% endif %}
+
+                        <div class="announcement-details">
+                            <h6 class="details-title">
+                                <i class="fas fa-file-alt me-2"></i>Details
+                            </h6>
+                            <div class="details-content">
+                                {{ announcement.content|linebreaksbr }}
+                            </div>
+                            {% if announcement.content|length > 500 %}
+                                <button class="btn btn-link btn-sm mt-2 p-0 read-more-btn" onclick="toggleContent(this)">
+                                    <i class="fas fa-chevron-down me-1"></i>Show More
+                                </button>
+                            {% endif %}
+                        </div>
+
+                        {% if announcement.target_audience %}
+                        <div class="announcement-audience mt-3">
+                            <small class="audience-label">
+                                <i class="fas fa-bullhorn me-1"></i>Audience:
+                            </small>
+                            {% if announcement.target_audience == 'trainees' %}
+                                <span class="badge badge-category text-dark">Students</span>
+                            {% elif announcement.target_audience == 'trainers' %}
+                                <span class="badge badge-trainer text-dark">Trainers</span>
+                            {% else %}
+                                <span class="badge badge-trainer text-dark">Everyone</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-outline-primary" data-announcement-id="{{ announcement.id }}" onclick="shareAnnouncement(this)">
+                                    <i class="fas fa-share me-1"></i>Share
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" data-announcement-id="{{ announcement.id }}" onclick="copyLink(this)">
+                                    <i class="fas fa-link me-1"></i>Copy Link
+                                </button>
+                            </div>
+                            <div class="card-timestamp">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ announcement.date_posted|date:'M d, Y' }} at {{ announcement.date_posted|time:'h:i A' }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3 class="empty-title">No Announcements Yet</h3>
+                <p class="empty-text">Check back later for important updates and announcements from your trainers and academy.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('active');
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target) &&
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Add any interactive functionality here if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Announcements page loaded successfully');
+        });
+
+        function markAllAsRead() {
+            // Send AJAX request to mark all announcements as read
+            fetch('{% url "trainee_announcements" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'mark_as_read=true'
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'alert alert-success alert-dismissible fade show';
+                    successMessage.innerHTML = `
+                        <strong>Success!</strong> ${data.marked_count} announcements marked as read.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.querySelector('.main-content').insertBefore(successMessage, document.querySelector('.main-content').firstChild);
+
+                    // Reload the page after a short delay to update notification counts
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                }
+            }).catch(error => {
+                console.error('Error marking announcements as read:', error);
+                // Show error message
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'alert alert-danger alert-dismissible fade show';
+                errorMessage.innerHTML = `
+                    <strong>Error!</strong> Failed to mark announcements as read. Please try again.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.main-content').insertBefore(errorMessage, document.querySelector('.main-content').firstChild);
+            });
+        }
+
+        function shareAnnouncement(button) {
+            const announcementId = button.getAttribute('data-announcement-id');
+            const shareUrl = `${window.location.origin}/announcements/${announcementId}/`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Announcement',
+                    text: 'Check out this announcement',
+                    url: shareUrl
+                }).catch(console.error);
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                copyLink(button);
+                showToast('Link copied to clipboard!', 'success');
+            }
+        }
+
+        function copyLink(button) {
+            const announcementId = button.getAttribute('data-announcement-id');
+            const shareUrl = `${window.location.origin}/announcements/${announcementId}/`;
+
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Link copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = shareUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Link copied to clipboard!', 'success');
+            });
+        }
+
+        function toggleContent(button) {
+            const detailsContent = button.parentElement.querySelector('.details-content');
+            const isExpanded = detailsContent.style.maxHeight === 'none';
+
+            if (isExpanded) {
+                detailsContent.style.maxHeight = '200px';
+                button.innerHTML = '<i class="fas fa-chevron-down me-1"></i>Show More';
+            } else {
+                detailsContent.style.maxHeight = 'none';
+                button.innerHTML = '<i class="fas fa-chevron-up me-1"></i>Show Less';
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

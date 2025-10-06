@@ -8,12 +8,116 @@ from django.views.decorators.csrf import csrf_protect
 from django.utils import timezone
 from django.db import models
 from django.db.models import Q
+from django.http import JsonResponse, HttpResponse
 from datetime import timedelta
 from .models import Course, Trainer, Trainee, Certificate, Announcement, DailyAssessment, TraineeAttendance, SessionRecording
+
+from PIL import Image, ImageDraw, ImageFont
+import os
+from django.conf import settings
 
 # --- HELPER FUNCTIONS ---
 def is_admin(user):
 	return user.is_authenticated and user.is_superuser
+
+# --- CERTIFICATE GENERATION UTILITY ---
+def generate_certificate_image(certificate_data):
+    """
+    Generate a certificate image with overlaid text data
+    """
+    try:
+        # Define certificate text positions (adjust these based on your template)
+        text_positions = {
+            'student_name': (400, 350),      # Center-top area
+            'course_name': (400, 420),       # Below student name
+            'completion_percentage': (400, 455),  # Marks/Percentage - NEW
+            'completion_date': (400, 490),   # Below percentage
+            'grade': (400, 560),             # Below date
+            'certificate_id': (650, 650),    # Bottom right
+        }
+
+        # Font settings - Use default fonts for better compatibility
+        try:
+            # Try to use DejaVu fonts if available (Linux/Mac)
+            title_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 36)
+            regular_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 24)
+            small_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 18)
+        except (OSError, IOError):
+            try:
+                # Try Windows fonts
+                title_font = ImageFont.truetype('arial.ttf', 36)
+                regular_font = ImageFont.truetype('arial.ttf', 24)
+                small_font = ImageFont.truetype('arial.ttf', 18)
+            except (OSError, IOError):
+                # Fallback to default font
+                title_font = ImageFont.load_default()
+                regular_font = ImageFont.load_default()
+                small_font = ImageFont.load_default()
+
+        # Template image path
+        template_path = os.path.join(settings.MEDIA_ROOT, 'certificate_templates', 'certificate_template.png')
+
+        # Check if template exists, if not create a simple colored background
+        if os.path.exists(template_path):
+            # Open the certificate template
+            certificate_img = Image.open(template_path)
+        else:
+            # Create a simple certificate background (fallback)
+            certificate_img = Image.new('RGB', (800, 600), color='#f8f9fa')
+            # Add a border
+            draw = ImageDraw.Draw(certificate_img)
+            draw.rectangle([50, 50, 750, 550], outline='#2d3748', width=3)
+
+        # Get image dimensions
+        img_width, img_height = certificate_img.size
+        draw = ImageDraw.Draw(certificate_img)
+
+        # Overlay text data
+        # Student name (centered, large font)
+        student_name = certificate_data.get('student_name', 'Student Name')
+        draw.text(text_positions['student_name'], student_name, fill='#000000', font=title_font, anchor='mm')
+
+        # Course name
+        course_name = certificate_data.get('course_name', 'Course Name')
+        draw.text(text_positions['course_name'], f"Course: {course_name}", fill='#000000', font=regular_font, anchor='mm')
+
+        # Completion percentage (marks)
+        completion_percentage = certificate_data.get('completion_percentage', 0)
+        draw.text(text_positions['completion_percentage'], f"Marks: {completion_percentage}%", fill='#000000', font=regular_font, anchor='mm')
+
+        # Completion date
+        completion_date = certificate_data.get('completion_date', 'Date')
+        draw.text(text_positions['completion_date'], f"Completed on: {completion_date}", fill='#000000', font=regular_font, anchor='mm')
+
+        # Grade
+        grade = certificate_data.get('grade', 'A')
+        draw.text(text_positions['grade'], f"Grade: {grade}", fill='#000000', font=regular_font, anchor='mm')
+
+        # Certificate ID (smaller font, bottom right)
+        certificate_id = certificate_data.get('certificate_id', 'CERT-001')
+        draw.text(text_positions['certificate_id'], f"ID: {certificate_id}", fill='#000000', font=small_font, anchor='mm')
+
+        # Add debug information (remove this in production)
+        print(f"Certificate generated for: {student_name}")
+        print(f"Course: {course_name}, Marks: {completion_percentage}%, Grade: {grade}")
+        print(f"Certificate ID: {certificate_id}")
+        print(f"Template path: {template_path}")
+        print(f"Template exists: {os.path.exists(template_path)}")
+
+        # Save the generated certificate
+        output_dir = os.path.join(settings.MEDIA_ROOT, 'certificates')
+        os.makedirs(output_dir, exist_ok=True)
+
+        output_filename = f"certificate_{certificate_id}.png"
+        output_path = os.path.join(output_dir, output_filename)
+
+        certificate_img.save(output_path, 'PNG', quality=95)
+
+        return output_path
+
+    except Exception as e:
+        print(f"Error generating certificate: {str(e)}")
+        return None
 
 # --- TRAINEE ATTENDANCE VIEWS ---
 from django.db.models import Count
@@ -174,7 +278,19 @@ def add_announcement(request):
         return redirect('announcements')
     return render(request, 'myapp/add_announcement.html')
 
-# --- ANNOUNCEMENTS VIEW (Updated for all user types) ---
+# --- DELETE ANNOUNCEMENT ---
+@login_required(login_url='/admin-login/')
+@user_passes_test(is_admin, login_url='/admin-login/')
+def delete_announcement(request, announcement_id):
+    announcement = get_object_or_404(Announcement, id=announcement_id)
+    if request.method == 'POST':
+        announcement.delete()
+        messages.success(request, 'Announcement deleted successfully!')
+        return redirect('announcements')
+    return render(request, 'myapp/confirm_delete.html', {'object': announcement, 'type': 'Announcement'})
+# --- ANNOUNCEMENTS VIEW ---
+@login_required(login_url='/admin-login/')
+@user_passes_test(is_admin, login_url='/admin-login/')
 def announcements(request):
 	# Check user type and show appropriate announcements
 	user = request.user
@@ -182,21 +298,21 @@ def announcements(request):
 
 	if user.is_superuser:
 		# Admin sees all announcements
-		announcements = Announcement.objects.order_by('-date_posted')
+		announcements = Announcement.objects.order_by('-date_posted', '-id')
 		can_create = True
 		user_type = 'admin'
 	elif hasattr(user, 'trainer'):
 		# Trainers see announcements targeted to 'all' and 'trainers'
 		announcements = Announcement.objects.filter(
 			models.Q(target_audience='all') | models.Q(target_audience='trainers')
-		).order_by('-date_posted')
+		).order_by('-date_posted', '-id')
 		can_create = True
 		user_type = 'trainer'
 	else:
 		# Trainees see announcements targeted to 'all' and 'trainees'
 		announcements = Announcement.objects.filter(
 			models.Q(target_audience='all') | models.Q(target_audience='trainees')
-		).order_by('-date_posted')
+		).order_by('-date_posted', '-id')
 		can_create = False
 		user_type = 'trainee'
 
@@ -207,37 +323,123 @@ def announcements(request):
 	})
 
 @login_required(login_url='/trainer-login/')
-def trainer_announcements(request):
+def create_announcement(request):
 	trainer = getattr(request.user, 'trainer', None)
 	if not trainer:
 		return redirect('trainer_login')
 
-	# Trainers can create announcements
 	if request.method == 'POST':
 		title = request.POST.get('title')
 		description = request.POST.get('description')
 		content = request.POST.get('content')
 		target_audience = request.POST.get('target_audience', 'all')
 
-		Announcement.objects.create(
-			title=title,
-			content=content,
-			short_description=description,
-			target_audience=target_audience,
-			date_posted=timezone.now().date(),
-			posted_by=f"Trainer {trainer.user.get_full_name()}",
-			academy='Vetri Academy'
-		)
-		messages.success(request, 'Announcement posted successfully!')
-		return redirect('trainer_announcements')
+		if title and content:
+			Announcement.objects.create(
+				title=title,
+				content=content,
+				short_description=description,
+				target_audience=target_audience,
+				date_posted=timezone.now().date(),
+				posted_by=f"Trainer {trainer.user.get_full_name()}",
+				academy='Vetri Academy'
+			)
+			messages.success(request, 'Announcement posted successfully!')
+			return redirect('trainer_announcements')
+		else:
+			messages.error(request, 'Please fill in all required fields.')
+
+	return render(request, 'myapp/create_announcement.html')
+
+
+@login_required(login_url='/trainer-login/')
+def trainer_announcements(request):
+	trainer = getattr(request.user, 'trainer', None)
+	if not trainer:
+		return redirect('trainer_login')
+
+	# Handle mark as read request
+	if request.method == 'POST' and request.POST.get('mark_as_read') == 'true':
+		# Get ALL announcements for trainers and mark them as viewed
+		all_trainer_announcements = Announcement.objects.filter(
+			models.Q(target_audience='all') | models.Q(target_audience='trainers')
+		).order_by('-date_posted', '-id')
+
+		announcement_ids = [ann.id for ann in all_trainer_announcements]
+		viewed_announcements = request.session.get('viewed_announcements', [])
+		request.session['viewed_announcements'] = list(set(viewed_announcements + announcement_ids))
+		request.session.modified = True
+
+		# Return JSON response for AJAX
+		return JsonResponse({'success': True, 'marked_count': len(announcement_ids)})
+
+	# Get ALL announcements for trainers and mark them as viewed
+	all_trainer_announcements = Announcement.objects.filter(
+		models.Q(target_audience='all') | models.Q(target_audience='trainers')
+	).order_by('-date_posted', '-id')
+
+	# Mark ALL announcements as viewed in session (not just recent 10)
+	announcement_ids = [ann.id for ann in all_trainer_announcements]
+	viewed_announcements = request.session.get('viewed_announcements', [])
+	request.session['viewed_announcements'] = list(set(viewed_announcements + announcement_ids))
+	request.session.modified = True
+
+	# Get recent announcements for display (last 10 for the list)
+	recent_announcements = all_trainer_announcements[:10]
 
 	# Show existing announcements for trainers
 	announcements = Announcement.objects.filter(
 		models.Q(target_audience='all') | models.Q(target_audience='trainers')
-	).order_by('-date_posted')
+	).order_by('-date_posted', '-id')
 
 	return render(request, 'myapp/trainer_announcements.html', {
 		'announcements': announcements
+	})
+
+@login_required(login_url='/student-login/')
+def trainee_announcements(request):
+	trainee = getattr(request.user, 'trainee', None)
+	if not trainee:
+		return redirect('student_login')
+
+	# Handle mark as read request
+	if request.method == 'POST' and request.POST.get('mark_as_read') == 'true':
+		# Get ALL announcements for trainees and mark them as viewed
+		all_trainee_announcements = Announcement.objects.filter(
+			models.Q(target_audience='all') | models.Q(target_audience='trainees')
+		).order_by('-date_posted', '-id')
+
+		announcement_ids = [ann.id for ann in all_trainee_announcements]
+		viewed_announcements = request.session.get('viewed_announcements', [])
+		request.session['viewed_announcements'] = list(set(viewed_announcements + announcement_ids))
+		request.session.modified = True
+
+		# Return JSON response for AJAX
+		return JsonResponse({'success': True, 'marked_count': len(announcement_ids)})
+
+	# Get ALL announcements for trainees and mark them as viewed
+	all_trainee_announcements = Announcement.objects.filter(
+		models.Q(target_audience='all') | models.Q(target_audience='trainees')
+	).order_by('-date_posted', '-id')
+
+	# Mark ALL announcements as viewed in session (not just recent 10)
+	announcement_ids = [ann.id for ann in all_trainee_announcements]
+	viewed_announcements = request.session.get('viewed_announcements', [])
+	request.session['viewed_announcements'] = list(set(viewed_announcements + announcement_ids))
+	request.session.modified = True
+
+	# Get recent announcements for display (last 10 for the list)
+	recent_announcements = all_trainee_announcements[:10]
+
+	# Show existing announcements for trainees (read-only)
+	announcements = Announcement.objects.filter(
+		models.Q(target_audience='all') | models.Q(target_audience='trainees')
+	).order_by('-date_posted', '-id')
+
+	return render(request, 'myapp/trainee_announcements.html', {
+		'announcements': announcements,
+		'can_create': False,  # Trainees cannot create announcements
+		'trainee': trainee,  # Add trainee object to context
 	})
 
 
@@ -441,9 +643,9 @@ def trainer_dashboard(request):
             messages.success(request, f"Your status has been set to {trainer.status}.")
             return redirect('trainer_dashboard')
 
-    # Get all courses assigned to trainer
-    assigned_courses = Course.objects.filter(name__icontains=trainer.assign_courses) if trainer.assign_courses else []
-    assigned_courses_count = len(assigned_courses)
+    # Get all courses assigned to trainer (courses where this trainer is assigned)
+    assigned_courses = Course.objects.filter(trainer=trainer, is_active=True)
+    assigned_courses_count = assigned_courses.count()
     
     # Get all trainees under the assigned courses
     all_trainees = []
@@ -486,6 +688,20 @@ def trainer_dashboard(request):
     # Sort trainees by status but don't limit - show all trainees
     all_trainees = sorted(all_trainees, key=lambda x: (x['status'] != 'Active', x['progress']), reverse=True)
     
+    # Get recent announcements for trainers (last 3 for display)
+    recent_announcements = Announcement.objects.filter(
+        models.Q(target_audience='all') | models.Q(target_audience='trainers')
+    ).order_by('-date_posted', '-id')[:3]
+
+    # Get ALL announcements for trainers to calculate real unread count
+    all_trainer_announcements = Announcement.objects.filter(
+        models.Q(target_audience='all') | models.Q(target_audience='trainers')
+    ).order_by('-date_posted', '-id')
+
+    # Get unread announcement count (based on session tracking)
+    viewed_announcements = request.session.get('viewed_announcements', [])
+    unread_announcements_count = len([ann for ann in all_trainer_announcements if ann.id not in viewed_announcements])
+    
     # Prepare course data for chart
     import json
     course_labels = [course['name'] for course in course_stats]
@@ -505,6 +721,9 @@ def trainer_dashboard(request):
         'recent_trainees': all_trainees,  # Changed from recent_trainees to all_trainees
         'course_labels': course_labels_json,
         'course_counts': course_counts_json,
+        'recent_announcements': recent_announcements,
+        'unread_announcements_count': unread_announcements_count,
+        'all_announcements': all_trainer_announcements,  # Add this for template access
     })
 
 @login_required(login_url='/admin-login/')
@@ -714,7 +933,7 @@ def admin_dashboard(request):
 		})
         
 	# Get latest announcements
-	latest_announcements = Announcement.objects.order_by('-date_posted')[:4]
+	latest_announcements = Announcement.objects.order_by('-date_posted', '-id')[:4]
 	course_qs = Course.objects.filter(is_active=True)
 	
 	# Prepare course data with proper JSON serialization
@@ -810,7 +1029,24 @@ def trainee_list_trainer(request):
     trainer = getattr(request.user, 'trainer', None)
     if not trainer:
         return redirect('trainer_login')
+
+    # Get search query from request
+    search_query = request.GET.get('search', '').strip()
+
+    # Base queryset - get trainees assigned to this trainer
     trainees = Trainee.objects.filter(trainer=trainer).select_related('user', 'course')
+
+    # Apply search filter if query exists
+    if search_query:
+        trainees = trainees.filter(
+            models.Q(user__first_name__icontains=search_query) |
+            models.Q(user__last_name__icontains=search_query) |
+            models.Q(user__username__icontains=search_query) |
+            models.Q(user__email__icontains=search_query) |
+            models.Q(course__name__icontains=search_query) |
+            models.Q(batch__icontains=search_query)
+        )
+
     # Find all batch numbers (as integers) for this trainer
     batch_numbers = [int(t.batch) for t in trainees if t.batch and t.batch.isdigit()]
     if batch_numbers:
@@ -819,7 +1055,9 @@ def trainee_list_trainer(request):
         all_batches = [str(i) for i in range(min_batch, max_batch + 1)]
     else:
         all_batches = ['No Batch']
+
     batch_dict = {batch: [] for batch in all_batches}
+
     for trainee in trainees:
         batch = trainee.batch or 'No Batch'
 
@@ -861,7 +1099,15 @@ def trainee_list_trainer(request):
             'remarks': trainee.remarks or '',
         }
         batch_dict.setdefault(batch, []).append(trainee_info)
-    return render(request, 'myapp/trainee_list_trainer.html', {'batch_dict': batch_dict})
+
+    # Pass search query to template for maintaining search state
+    context = {
+        'batch_dict': batch_dict,
+        'search_query': search_query,
+        'total_trainees': trainees.count()
+    }
+
+    return render(request, 'myapp/trainee_list_trainer.html', context)
 
 @login_required(login_url='/trainer-login/')
 def update_assessment(request, trainee_id):
@@ -1237,12 +1483,29 @@ def student_certificates(request):
         'total_certificates': certificates.count()
     }
 
+    return render(request, 'myapp/student_certificates.html', context)
+
 @login_required
 @user_passes_test(is_admin, login_url='/admin-login/')
 def admin_certificates(request):
-    """Admin certificate management page - shows all certificates in the system"""
+    """Admin certificate management page - shows all certificates in the system with management features"""
     # Get all certificates with related data
     certificates = Certificate.objects.select_related('trainee__user', 'course').order_by('-issued_date')
+
+    # Add serial numbers for display
+    certificates_with_sno = []
+    for idx, cert in enumerate(certificates, 1):
+        certificates_with_sno.append({
+            'sno': idx,
+            'certificate': cert,
+            'trainee_name': cert.trainee.user.get_full_name() or cert.trainee.user.username,
+            'course_name': cert.course.name if cert.course else 'N/A',
+            'certificate_id': cert.certificate_number,
+            'issue_date': cert.issued_date,
+            'status': 'Verified' if cert.is_verified else 'Pending',
+            'completion_percentage': cert.completion_percentage,
+            'grade': cert.grade
+        })
 
     # Calculate statistics
     total_certificates = certificates.count()
@@ -1272,17 +1535,166 @@ def admin_certificates(request):
                 'code': course.code
             })
 
+    # Check if certificate template exists
+    template_path = os.path.join(settings.MEDIA_ROOT, 'certificate_templates', 'certificate_template.png')
+    template_exists = os.path.exists(template_path)
+    current_template = 'certificate_template.png' if template_exists else None
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        certificate_id = request.POST.get('certificate_id')
+
+        if action == 'generate':
+            # Generate certificate for a trainee
+            trainee_id = request.POST.get('trainee_id')
+            course_id = request.POST.get('course_id')
+            completion_percentage = request.POST.get('completion_percentage', 100)
+            grade = request.POST.get('grade', 'A')
+
+            try:
+                trainee = Trainee.objects.get(id=trainee_id)
+                course = Course.objects.get(id=course_id)
+
+                # Check if certificate already exists
+                existing_cert = Certificate.objects.filter(trainee=trainee, course=course).first()
+                if existing_cert:
+                    messages.error(request, f'Certificate already exists for {trainee.user.get_full_name()} in {course.name}')
+                else:
+                    # Create new certificate
+                    certificate = Certificate.objects.create(
+                        trainee=trainee,
+                        course=course,
+                        completion_percentage=int(completion_percentage),
+                        grade=grade,
+                        is_verified=True
+                    )
+
+                    # Generate certificate image
+                    certificate_path = generate_certificate_image({
+                        'student_name': trainee.user.get_full_name() or trainee.user.username,
+                        'course_name': course.name,
+                        'completion_percentage': int(completion_percentage),
+                        'completion_date': certificate.issued_date.strftime('%B %d, %Y'),
+                        'grade': grade,
+                        'certificate_id': certificate.certificate_number
+                    })
+
+                    if certificate_path:
+                        messages.success(request, f'Certificate generated and image created for {trainee.user.get_full_name()} in {course.name}')
+                    else:
+                        messages.warning(request, f'Certificate generated for {trainee.user.get_full_name()} in {course.name}, but image creation failed')
+
+                    return redirect('admin_certificates')
+
+            except (Trainee.DoesNotExist, Course.DoesNotExist) as e:
+                messages.error(request, 'Invalid trainee or course selection')
+
+        elif action == 'delete' and certificate_id:
+            try:
+                certificate = Certificate.objects.get(id=certificate_id)
+                certificate.delete()
+                messages.success(request, 'Certificate deleted successfully!')
+                return redirect('admin_certificates')
+            except Certificate.DoesNotExist:
+                messages.error(request, 'Certificate not found!')
+
+        elif action == 'upload_template':
+            template_file = request.FILES.get('template_file')
+            if template_file:
+                # Ensure certificate_templates directory exists
+                template_dir = os.path.join(settings.MEDIA_ROOT, 'certificate_templates')
+                os.makedirs(template_dir, exist_ok=True)
+
+                # Save the uploaded template
+                template_path = os.path.join(template_dir, 'certificate_template.png')
+                with open(template_path, 'wb+') as destination:
+                    for chunk in template_file.chunks():
+                        destination.write(chunk)
+
+                messages.success(request, 'Certificate template uploaded successfully!')
+                return redirect('admin_certificates')
+            else:
+                messages.error(request, 'Please select a template file to upload.')
+
+        elif action == 'regenerate_all':
+            # Regenerate all existing certificates with new format
+            certificates = Certificate.objects.all()
+            regenerated_count = 0
+
+            for cert in certificates:
+                try:
+                    # Generate certificate image with new format
+                    certificate_path = generate_certificate_image({
+                        'student_name': cert.trainee.user.get_full_name() or cert.trainee.user.username,
+                        'course_name': cert.course.name if cert.course else 'Course',
+                        'completion_percentage': cert.completion_percentage,
+                        'completion_date': cert.issued_date.strftime('%B %d, %Y'),
+                        'grade': cert.grade,
+                        'certificate_id': cert.certificate_number
+                    })
+
+                    if certificate_path:
+                        regenerated_count += 1
+
+                except Exception as e:
+                    print(f"Error regenerating certificate {cert.id}: {str(e)}")
+
+            messages.success(request, f'Successfully regenerated {regenerated_count} certificates!')
+            return redirect('admin_certificates')
+
+    # Get trainees and courses for the generate certificate form
+    trainees = Trainee.objects.select_related('user', 'course').filter(status='Active')
+    courses = Course.objects.filter(is_active=True)
+
     context = {
-        'certificates': certificates,
+        'certificates': certificates_with_sno,
         'total_certificates': total_certificates,
         'verified_certificates': verified_certificates,
         'pending_certificates': pending_certificates,
         'recent_certificates': recent_certificates,
         'grade_distribution': grade_distribution,
         'course_stats': course_stats,
+        'trainees': trainees,
+        'courses': courses,
+        'template_exists': template_exists,
+        'current_template': current_template,
     }
 
     return render(request, 'myapp/admin_certificates.html', context)
+
+@login_required(login_url='/admin-login/')
+@user_passes_test(is_admin, login_url='/admin-login/')
+def download_certificate(request, certificate_id):
+    """Download certificate image"""
+    try:
+        certificate = Certificate.objects.get(id=certificate_id)
+
+        # Generate certificate image if it doesn't exist
+        certificate_path = generate_certificate_image({
+            'student_name': certificate.trainee.user.get_full_name() or certificate.trainee.user.username,
+            'course_name': certificate.course.name if certificate.course else 'Course',
+            'completion_percentage': certificate.completion_percentage,
+            'completion_date': certificate.issued_date.strftime('%B %d, %Y'),
+            'grade': certificate.grade,
+            'certificate_id': certificate.certificate_number
+        })
+
+        if certificate_path and os.path.exists(certificate_path):
+            # Serve the file for download
+            with open(certificate_path, 'rb') as f:
+                response = HttpResponse(f.read(), content_type='image/png')
+                response['Content-Disposition'] = f'attachment; filename="certificate_{certificate.certificate_number}.png"'
+                return response
+        else:
+            messages.error(request, 'Certificate image not found. Please regenerate the certificate.')
+            return redirect('admin_certificates')
+
+    except Certificate.DoesNotExist:
+        messages.error(request, 'Certificate not found!')
+        return redirect('admin_certificates')
+    except Exception as e:
+        messages.error(request, f'Error downloading certificate: {str(e)}')
+        return redirect('admin_certificates')
 
 
 @login_required(login_url='/student-login/')
@@ -1427,8 +1839,14 @@ def trainee_dashboard(request):
         models.Q(target_audience='all') | models.Q(target_audience='trainees')
     ).order_by('-date_posted')[:3]
 
-    # Get unread announcement count
-    unread_announcements_count = recent_announcements.count()
+    # Get ALL announcements for trainees to calculate real unread count
+    all_trainee_announcements = Announcement.objects.filter(
+        models.Q(target_audience='all') | models.Q(target_audience='trainees')
+    ).order_by('-date_posted', '-id')
+
+    # Get unread announcement count (based on session tracking)
+    viewed_announcements = request.session.get('viewed_announcements', [])
+    unread_announcements_count = len([ann for ann in all_trainee_announcements if ann.id not in viewed_announcements])
     
     # Prepare data for charts
     weekly_labels = [day['day'] for day in weekly_activity]
@@ -1474,6 +1892,8 @@ def my_courses(request):
 
     # For each course, get session recordings and other stats
     courses_data = []
+    all_sessions = []
+
     for course in enrolled_courses:
         # Get session recordings for this course (by matching batch or course)
         course_sessions = SessionRecording.objects.filter(
@@ -1481,6 +1901,11 @@ def my_courses(request):
             is_active=True,
             is_visible=True
         ).select_related('trainer__user').order_by('-upload_date')[:5]  # Last 5 sessions
+
+        # Add course name to each session for the separate section
+        for session in course_sessions:
+            session.course_name = course.name
+            all_sessions.append(session)
 
         # Get course statistics
         total_tasks = trainee.total_task if course == trainee.course else 0
@@ -1501,6 +1926,7 @@ def my_courses(request):
         'trainee': trainee,
         'courses_data': courses_data,
         'total_enrolled_courses': len(courses_data),
+        'all_sessions': all_sessions,  # All sessions for the separate section
     }
 
     return render(request, 'myapp/courses.html', context)

@@ -2,64 +2,408 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'myapp/css/admin_dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'myapp/css/admin_dashboard.css' %}">
+    <style>
+        /* Enhanced Hamburger Button for Admin Dashboard */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important; /* Purple to blue gradient */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem !important;
+            font-size: 1.25rem !important;
+            cursor: pointer !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: none !important; /* Hidden by default - only show on mobile */
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #2980b9 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6) !important;
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Mobile: Show hamburger prominently */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                width: 50px !important;
+                height: 50px !important;
+                box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            }
+        }
+
+        /* Sidebar Close Button */
+        .sidebar-close {
+            position: fixed !important;
+            top: 1rem !important;
+            right: 1rem !important;
+            z-index: 1001 !important;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important; /* Red gradient */
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: none !important;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .sidebar-close:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6) !important;
+        }
+
+        .sidebar-close:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Show close button when sidebar is active on mobile */
+        @media (max-width: 768px) {
+            .sidebar.active ~ .sidebar-close {
+                display: block !important;
+            }
+        }
+
+        /* Mobile: Enhanced hamburger styling */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block !important;
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #9b59b6 0%, #3498db 100%) !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                width: 50px !important;
+                height: 50px !important;
+                box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4) !important;
+            }
+        }
+
+        /* Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #222e3a;
+            color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0); /* Show by default on desktop */
+        }
+
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%); /* Hide by default on mobile */
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0) !important; /* Show when active */
+                z-index: 1000 !important;
+            }
+        }
+
+        /* Main content responsive adjustments */
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+            transition: var(--transition);
+        }
+
+        /* Desktop main content */
+        @media (min-width: 992px) {
+            .main-content {
+                margin-left: 280px;
+                padding: 2rem;
+            }
+        }
+
+        /* Tablet main content */
+        @media (min-width: 576px) and (max-width: 991px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                width: 100%;
+            }
+
+            .summary-cards {
+                gap: 1rem;
+            }
+
+            .summary-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .dashboard-section {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            /* Charts responsive */
+            .pie-chart, .bar-chart {
+                max-height: 300px;
+                width: 100%;
+                height: 100% !important;
+            }
+
+            /* Bar chart specific styling */
+            #barChart {
+                max-height: 250px;
+            }
+
+            /* Stack columns on mobile */
+            .col-lg-7, .col-lg-5 {
+                margin-bottom: 1rem;
+            }
+
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Topbar responsive */
+        .topbar, .topbar-mobile {
+            background: #3865ff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .topbar {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Mobile topbar styling */
+        .topbar-mobile {
+            background: #3865ff;
+            color: white !important;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 4rem 1rem 2rem 1rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            z-index: 10;
+        }
+
+        .topbar-mobile .dashboard-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .topbar-mobile .dashboard-title small {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 400;
+            display: block;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        /* Tablet responsive adjustments (576px - 991px) */
+        @media (min-width: 576px) and (max-width: 991px) {
+            .topbar-mobile {
+                margin: 4rem 1.5rem 2rem 1.5rem;
+                padding: 1.75rem;
+            }
+
+            .topbar-mobile .dashboard-title {
+                font-size: 1.6rem;
+                text-align: center;
+            }
+
+            .topbar-mobile .d-flex {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+        }
+
+        /* Enhanced responsive layout for mobile topbar */
+        @media (max-width: 575px) {
+            .topbar-mobile .d-flex {
+                flex-direction: row;
+                align-items: center;
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .topbar-mobile .search-box {
+                width: 100%;
+                max-width: 200px;
+                margin-bottom: 0.5rem;
+            }
+
+            .topbar-mobile .icon-btn {
+                margin: 0 0.25rem;
+            }
+
+            .topbar-mobile .user-info {
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* Improved tablet layout */
+        @media (min-width: 576px) and (max-width: 991px) {
+            .topbar-mobile .d-flex {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-top: 1.25rem;
+            }
+        }
+
+        /* Desktop topbar */
+        .topbar {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Enhanced responsive typography */
+        @media (min-width: 992px) {
+            .topbar {
+                padding: 2rem;
+            }
+
+            .dashboard-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Mobile icon buttons */
+        .mobile-icon-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .mobile-icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        .mobile-icon-btn i {
+            color: white;
+            font-size: 1rem;
+        }
+    </style>
     <!-- Chart.js and plugins -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 </head>
 <body>
-    <button class="sidebar-toggle d-lg-none" aria-label="Toggle sidebar" style="position:fixed;top:18px;left:18px;z-index:200;background:none;border:none;font-size:2rem;color:#9747FF;">
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
     </button>
+
+    <!-- Sidebar -->
     {% include 'myapp/_sidebar.html' %}
+
     <div class="main-content">
-    <div class="topbar d-flex justify-content-between align-items-center flex-lg-row flex-column gap-2">
-    <script>
-    // Hamburger sidebar toggle for mobile
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.querySelector('.sidebar');
-        const toggleBtn = document.querySelector('.sidebar-toggle');
-        function closeSidebar() {
-            sidebar.style.transform = 'translateX(-100%)';
-        }
-        function openSidebar() {
-            sidebar.style.transform = 'translateX(0)';
-        }
-        if (window.innerWidth < 992) {
-            closeSidebar();
-        }
-        toggleBtn.addEventListener('click', function() {
-            if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)') {
-                closeSidebar();
-            } else {
-                openSidebar();
-            }
-        });
-        window.addEventListener('resize', function() {
-            if (window.innerWidth < 992) {
-                closeSidebar();
-            } else {
-                sidebar.style.transform = '';
-            }
-        });
-    });
-    </script>
-            <h1 class="dashboard-title">Admin Dashboard <br> <small class="fs-6">Welcome back, Here's an overview of your platform activities and key metrics.</small></h1>
-            
-            <div class="d-flex align-items-center">
-                <input type="text" class="search-box me-2" placeholder="Search...">
-                <button class="icon-btn"><i class="fas fa-bell"></i></button>
-                <button class="icon-btn"><i class="fas fa-envelope"></i></button>
-                <div class="user-info ms-3">
-                    <span class="badge bg-info">VTS Admin</span>
-                </div>
+    <div class="topbar-mobile d-lg-none">
+        <h1 class="dashboard-title">Admin Dashboard <br> <small class="fs-6">Welcome back, Here's an overview of your platform activities and key metrics.</small></h1>
+
+        <div class="d-flex align-items-center justify-content-center gap-3 mt-3 flex-wrap">
+            <div class="d-flex align-items-center gap-2">
+                <input type="text" class="search-box" placeholder="Search...">
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="mobile-icon-btn" onclick="showNotification()">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="mobile-icon-btn" onclick="showMessages()">
+                    <i class="fas fa-envelope"></i>
+                </button>
+            </div>
+            <div class="user-info">
+                <span class="badge bg-info">VTS Admin</span>
             </div>
         </div>
+    </div>
+    <div class="topbar d-none d-lg-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="dashboard-title">Admin Dashboard <br> <small class="fs-6">Welcome back, Here's an overview of your platform activities and key metrics.</small></h1>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <input type="text" class="search-box" placeholder="Search...">
+            <button class="icon-btn"><i class="fas fa-bell"></i></button>
+            <button class="icon-btn"><i class="fas fa-envelope"></i></button>
+            <div class="user-info ms-2">
+                <span class="badge bg-info">VTS Admin</span>
+            </div>
+        </div>
+    </div>
         <div class="summary-cards">
             <div class="summary-card text-center">
                 <div class="icon"><i class="fas fa-user-graduate"></i></div>
@@ -321,7 +665,9 @@
             <div class="col-md-6">
                 <div class="dashboard-section">
                     <h6>Trainer Insights</h6>
-                    <canvas id="barChart" class="bar-chart"></canvas>
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="barChart" class="bar-chart"></canvas>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -367,21 +713,187 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Bar Chart for Trainer Insights
-        const barChartCtx = document.getElementById('barChart').getContext('2d');
-        new Chart(barChartCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                datasets: [{
-                    label: 'Number of New Trainers',
-                    data: [2, 3, 5, 4, 2, 3, 6],
-                    backgroundColor: '#3865ff',
-                }]
-            },
-            options: { plugins: { legend: { display: false } } }
+        // Enhanced hamburger functionality for Admin Dashboard
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768) {
+                const isActive = sidebar.classList.contains('active');
+
+                if (isActive) {
+                    // Close sidebar
+                    sidebar.classList.remove('active');
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                } else {
+                    // Open sidebar
+                    sidebar.classList.add('active');
+                    sidebar.style.transform = 'translateX(0)';
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                }
+            }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768 &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target) &&
+                !closeBtn?.contains(event.target)) {
+
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(-100%)';
+                toggleBtn.style.display = 'block';
+                closeBtn.style.display = 'none';
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebar.style.transform = 'translateX(0)';
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+            } else {
+                if (!sidebar.classList.contains('active')) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    toggleBtn.style.display = 'block';
+                    if (closeBtn) closeBtn.style.display = 'none';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    if (closeBtn) closeBtn.style.display = 'block';
+                }
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const closeBtn = document.querySelector('.sidebar-close');
+
+            if (window.innerWidth <= 768) {
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                if (closeBtn) closeBtn.style.display = 'none';
+            } else {
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+            }
+        });
+    </script>
+    <script>
+        // Chart initialization for admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pie Chart for Trainee Distribution by Course
+            const pieChartCtx = document.getElementById('pieChart');
+            if (pieChartCtx) {
+                try {
+                    const labels = JSON.parse('{{ course_labels|escapejs }}');
+                    const data = JSON.parse('{{ course_counts|escapejs }}');
+
+                    if (labels && data && labels.length > 0) {
+                        const colors = [
+                            '#3865ff', '#19c37d', '#9747FF', '#ff6384', '#ffb347',
+                            '#5f6ef7', '#52fe97', '#7498FE', '#B27AFF', '#00c853'
+                        ];
+
+                        new Chart(pieChartCtx.getContext('2d'), {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    data: data,
+                                    backgroundColor: colors.slice(0, labels.length),
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'right',
+                                        labels: {
+                                            boxWidth: 15,
+                                            padding: 15,
+                                            font: { size: 12 }
+                                        }
+                                    },
+                                    datalabels: {
+                                        color: '#fff',
+                                        font: { weight: 'bold', size: 12 },
+                                        formatter: function(value, ctx) {
+                                            const total = data.reduce((a, b) => a + b, 0);
+                                            const percent = ((value / total) * 100).toFixed(1);
+                                            return `${value}\n(${percent}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error creating pie chart:', error);
+                }
+            }
+
+            // Bar Chart for Trainer Insights
+            const barChartCtx = document.getElementById('barChart');
+            if (barChartCtx) {
+                const barContainer = barChartCtx.parentElement;
+                barContainer.style.height = '250px';
+
+                new Chart(barChartCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [{
+                            label: 'New Trainers',
+                            data: [2, 3, 5, 4, 2, 3, 6],
+                            backgroundColor: '#3865ff',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>

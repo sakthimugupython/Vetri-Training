@@ -61,8 +61,9 @@
 
         .meta-item {
             display: flex;
-            align-items: center;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 15px;
         }
 
         .meta-item:last-child {
@@ -70,8 +71,8 @@
         }
 
         .meta-icon {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: var(--primary-gradient);
             border-radius: 50%;
             display: flex;
@@ -79,17 +80,25 @@
             justify-content: center;
             color: white;
             margin-right: 15px;
+            flex-shrink: 0;
         }
 
         .meta-label {
             font-weight: 600;
             color: #495057;
             min-width: 120px;
+            margin-bottom: 5px;
         }
 
         .meta-value {
             color: #2c3e50;
             font-weight: 500;
+            word-break: break-word;
+        }
+
+        .meta-content {
+            flex: 1;
+            min-width: 0;
         }
 
         .session-description {
@@ -116,6 +125,65 @@
             text-align: center;
         }
 
+        .action-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem 1rem 0.5rem;
+            min-width: 160px;
+            justify-content: center;
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 15px rgba(147, 76, 210, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 76, 210, 0.4);
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .action-btn i {
+            font-size: 1.1em;
+        }
+
+        /* Specific action button colors */
+        .action-btn[href*="session_list"] {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .action-btn[href*="session_list"]:hover {
+            background: linear-gradient(135deg, #545b62 0%, #343a40 100%);
+        }
+
+        .action-btn[href*="session_url"] {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .action-btn[href*="session_url"]:hover {
+            background: linear-gradient(135deg, #218838 0%, #1dd1a1 100%);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #c82333 0%, #d63031 100%);
+        }
+
         .visibility-btn {
             border: none;
             border-radius: 12px;
@@ -127,20 +195,28 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s ease;
+            min-width: 160px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .visibility-show {
-            background: var(--success-gradient);
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
         }
 
         .visibility-hide {
-            background: var(--warning-gradient);
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
         }
 
         .visibility-btn:hover {
             transform: translateY(-2px);
             color: white;
             text-decoration: none;
+            filter: brightness(1.1);
+        }
+
+        .visibility-btn:active {
+            transform: translateY(0);
         }
 
         .related-sessions {
@@ -171,6 +247,11 @@
             font-size: 0.9em;
         }
 
+        .status-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
         .status-badge {
             position: absolute;
             top: 15px;
@@ -179,43 +260,236 @@
             border-radius: 20px;
             font-size: 0.8em;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .status-success {
-            background: var(--success-gradient);
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
         }
 
         .status-failed {
-            background: linear-gradient(135deg, #FF5252 0%, #E53935 100%);
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
             color: white;
         }
 
         .status-pending {
-            background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
             color: white;
+        }
+
+        /* Hamburger Button - Session Detail Page */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            background: var(--primary-gradient) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            cursor: pointer !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: block !important;
+            box-shadow: 0 3px 10px rgba(147, 76, 210, 0.3) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 4px 15px rgba(147, 76, 210, 0.4) !important;
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Desktop: Hide hamburger */
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Sidebar styling for mobile slide-in effect */
+        .sidebar {
+            background: #23243a;
+            color: #fff;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(0); /* Show by default on desktop */
+        }
+
+        /* Mobile sidebar behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%); /* Hide by default on mobile */
+            }
+
+            .sidebar.active {
+                transform: translateX(0); /* Show when active */
+            }
+        }
+
+        /* Main Content - Enhanced Responsive */
+        .main-content {
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+
+            .session-header {
+                padding: 2rem 1rem;
+                margin-bottom: 2rem;
+                position: relative;
+            }
+
+            .status-wrapper {
+                position: relative;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+
+            .status-badge {
+                position: relative;
+                top: auto;
+                right: auto;
+                display: inline-block;
+                margin-bottom: 1rem;
+                font-size: 0.75rem;
+                padding: 6px 12px;
+            }
+
+            .session-card {
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .session-title {
+                font-size: 1.5rem;
+            }
+
+            .session-meta {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .meta-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                margin-bottom: 15px;
+                padding: 12px;
+                background: rgba(147, 76, 210, 0.05);
+                border-radius: 10px;
+            }
+
+            .meta-icon {
+                width: 35px;
+                height: 35px;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+
+            .meta-label {
+                font-size: 0.85rem;
+                min-width: auto;
+                margin-bottom: 3px;
+            }
+
+            .meta-value {
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+
+            .meta-value a {
+                word-break: break-all;
+                font-size: 0.85rem;
+            }
+
+            .visibility-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+                width: 100%;
+                text-align: center;
+                min-width: auto;
+            }
+
+            .visibility-show {
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            }
+
+            .visibility-hide {
+                background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+            }
+
+            .related-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Stack related sessions vertically on mobile */
+            .col-lg-4 {
+                margin-top: 2rem;
+            }
+        }
+
+        /* Desktop responsive adjustments */
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+                padding: 2rem;
+                width: calc(100% - 280px);
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <!-- Sidebar -->
     {% include 'trainer/_sidebar.html' %}
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid py-4">
-            <!-- Header Section -->
             <div class="session-header">
                 <div class="position-relative">
-                    <span class="status-badge {% if session.upload_status == 'success' %}status-success{% elif session.upload_status == 'failed' %}status-failed{% else %}status-pending{% endif %}">
-                        {% if session.upload_status == 'success' %}
-                            <i class="fas fa-check-circle me-1"></i>Success
-                        {% elif session.upload_status == 'failed' %}
-                            <i class="fas fa-times-circle me-1"></i>Failed
-                        {% else %}
-                            <i class="fas fa-clock me-1"></i>Pending
-                        {% endif %}
-                    </span>
+                    <div class="status-wrapper">
+                        <span class="status-badge {% if session.upload_status == 'success' %}status-success{% elif session.upload_status == 'failed' %}status-failed{% else %}status-pending{% endif %}">
+                            {% if session.upload_status == 'success' %}
+                                <i class="fas fa-check-circle me-1"></i>Success
+                            {% elif session.upload_status == 'failed' %}
+                                <i class="fas fa-times-circle me-1"></i>Failed
+                            {% else %}
+                                <i class="fas fa-clock me-1"></i>Pending
+                            {% endif %}
+                        </span>
+                    </div>
                     <h2><i class="fas fa-video me-3"></i>{{ session.title }}</h2>
                     <p>Session Dashboard - Batch {{ session.batch }}</p>
                 </div>
@@ -231,39 +505,46 @@
                                 Session Information
                             </h3>
 
-                            <!-- Session Metadata -->
                             <div class="session-meta">
                                 <div class="meta-item">
                                     <div class="meta-icon">
                                         <i class="fas fa-users"></i>
                                     </div>
-                                    <div class="meta-label">Target Batch:</div>
-                                    <div class="meta-value">Batch {{ session.batch }}</div>
+                                    <div class="meta-content">
+                                        <div class="meta-label">Target Batch:</div>
+                                        <div class="meta-value">Batch {{ session.batch }}</div>
+                                    </div>
                                 </div>
                                 <div class="meta-item">
                                     <div class="meta-icon">
                                         <i class="fas fa-calendar"></i>
                                     </div>
-                                    <div class="meta-label">Upload Date:</div>
-                                    <div class="meta-value">{{ session.upload_date|date:"F d, Y \a\t h:i A" }}</div>
+                                    <div class="meta-content">
+                                        <div class="meta-label">Upload Date:</div>
+                                        <div class="meta-value">{{ session.upload_date|date:"F d, Y \a\t h:i A" }}</div>
+                                    </div>
                                 </div>
                                 <div class="meta-item">
                                     <div class="meta-icon">
                                         <i class="fas fa-user-graduate"></i>
                                     </div>
-                                    <div class="meta-label">Uploaded By:</div>
-                                    <div class="meta-value">{{ session.trainer.user.get_full_name|default:session.trainer.user.username }}</div>
+                                    <div class="meta-content">
+                                        <div class="meta-label">Uploaded By:</div>
+                                        <div class="meta-value">{{ session.trainer.user.get_full_name|default:session.trainer.user.username }}</div>
+                                    </div>
                                 </div>
                                 <div class="meta-item">
                                     <div class="meta-icon">
                                         <i class="fas fa-link"></i>
                                     </div>
-                                    <div class="meta-label">Session URL:</div>
-                                    <div class="meta-value">
-                                        <a href="{{ session.session_url }}" target="_blank" class="text-decoration-none">
-                                            {{ session.session_url|truncatechars:50 }}
-                                            <i class="fas fa-external-link-alt ms-1"></i>
-                                        </a>
+                                    <div class="meta-content">
+                                        <div class="meta-label">Session URL:</div>
+                                        <div class="meta-value">
+                                            <a href="{{ session.session_url }}" target="_blank" class="text-decoration-none">
+                                                {{ session.session_url|truncatechars:50 }}
+                                                <i class="fas fa-external-link-alt ms-1"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -300,7 +581,7 @@
                                             {% endif %}
                                         </button>
                                     </form>
-                                    <a href="{% url 'delete_session' session.id %}" class="action-btn" onclick="return confirm('Are you sure you want to delete this session? This action cannot be undone.')">
+                                    <a href="{% url 'delete_session' session.id %}" class="action-btn delete-btn" onclick="return confirm('Are you sure you want to delete this session? This action cannot be undone.')">
                                         <i class="fas fa-trash"></i>
                                         Delete Session
                                     </a>
@@ -373,5 +654,106 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Hamburger functionality for Session Detail page
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('active');
+
+                // Hide/show hamburger button based on sidebar state
+                if (sidebar.classList.contains('active')) {
+                    toggleBtn.style.display = 'none';
+                    console.log('Session Detail: Sidebar opened, hiding hamburger');
+                } else {
+                    toggleBtn.style.display = 'block';
+                    console.log('Session Detail: Sidebar closed, showing hamburger');
+                }
+            }
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth <= 768 &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                console.log('Session Detail: Sidebar closed via outside click');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                console.log('Session Detail: Desktop view - hiding hamburger');
+            } else {
+                toggleBtn.style.display = 'block';
+                console.log('Session Detail: Mobile view - showing hamburger');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+
+            console.log('=== SESSION DETAIL PAGE INITIALIZING ===');
+
+            // Set initial state based on screen size
+            if (window.innerWidth <= 768) {
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'block';
+                console.log('📱 Session Detail: Mobile mode - hamburger VISIBLE');
+            } else {
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                console.log('💻 Session Detail: Desktop mode - hamburger HIDDEN');
+            }
+
+            console.log('Screen width:', window.innerWidth);
+            console.log('Toggle button found:', !!toggleBtn);
+            console.log('Sidebar found:', !!sidebar);
+        });
+
+        // Enhanced action button interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to action buttons
+            const actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Enhanced external link handling
+            const externalLinks = document.querySelectorAll('a[href*="youtube.com"], a[href*="drive.google"], a[href*="meet.google"], a[href*="zoom.us"]');
+            externalLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    console.log(`🔗 Opening external link: ${url}`);
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

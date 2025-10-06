@@ -18,22 +18,158 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* Sidebar Toggle Button - Enhanced */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 9999; /* Very high z-index to ensure visibility */
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(147, 76, 210, 0.4);
+            width: 55px;
+            height: 55px;
+            display: block; /* Show by default for debugging */
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2); /* Add visible border */
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(147, 76, 210, 0.6);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Ensure hamburger button is always on top */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 1rem !important;
+            left: 1rem !important;
+            z-index: 9999 !important;
+            display: block !important; /* Force visible for debugging */
+        }
+
+        /* Debug: Add bright background to make button super visible */
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                background: linear-gradient(45deg, #ff6b6b, #ee5a52) !important;
+                border: 3px solid #fff !important;
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.8) !important;
+                animation: pulse 2s infinite !important;
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .sidebar .logo {
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0 1.2rem;
+        }
+
+        .sidebar nav .nav-link {
+            color: #fff;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 1rem;
+            margin-bottom: 2px;
+            transition: background 0.2s, font-weight 0.2s;
+            text-decoration: none;
+        }
+
+        .sidebar nav .nav-link.active {
+            background: var(--primary-gradient);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(147, 76, 210, 0.3);
+        }
+
+        .sidebar nav .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar nav .nav-link:hover {
+            background: rgba(147, 76, 210, 0.2);
+            color: #fff;
+        }
+
+        /* Main Content - Enhanced Responsive */
+        .main-content {
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+        }
+
+        /* Tablet responsive adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .main-content {
+                margin-left: 260px;
+                padding: 1.5rem;
+                width: calc(100% - 260px);
+            }
+        }
+
+        /* Prevent horizontal scrolling on mobile */
+        @media (max-width: 768px) {
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            /* Ensure proper mobile viewport handling */
+            * {
+                box-sizing: border-box;
+            }
+        }
+
         .sessions-header {
             background: var(--primary-gradient);
             color: white;
-            padding: 40px;
-            border-radius: 0 0 25px 25px;
+            padding: 2rem;
+            border-radius: 20px;
             box-shadow: 0 8px 25px rgba(147, 76, 210, 0.3);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
         }
 
         .session-card {
             background: white;
             border-radius: 15px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            padding: 25px;
-            margin-bottom: 25px;
+            padding: 2rem;
+            margin-bottom: 2rem;
             border: none;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -46,27 +182,33 @@
         .session-title {
             color: #2c3e50;
             font-weight: 700;
-            margin-bottom: 10px;
-            font-size: 1.3em;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
         }
 
         .session-meta {
             color: #6c757d;
-            font-size: 0.9em;
-            margin-bottom: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
         }
 
         .session-description {
             color: #495057;
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.8rem;
+            white-space: nowrap;
         }
 
         .video-container {
             background: #000;
             border-radius: 12px;
             overflow: hidden;
-            margin-top: 15px;
+            margin-top: 1rem;
         }
 
         .video-container video {
@@ -82,7 +224,7 @@
             width: 60px;
             height: 60px;
             color: white;
-            font-size: 1.5em;
+            font-size: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(147, 76, 210, 0.4);
@@ -95,29 +237,137 @@
 
         .no-sessions {
             text-align: center;
-            padding: 60px 20px;
+            padding: 4rem 2rem;
             color: #6c757d;
         }
 
         .no-sessions i {
-            font-size: 4em;
-            margin-bottom: 20px;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
             opacity: 0.5;
         }
 
         .batch-badge {
             background: var(--secondary-gradient);
             color: white;
-            padding: 8px 16px;
+            padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.85em;
+            font-size: 0.85rem;
             font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            /* Mobile responsive adjustments */
+            .sessions-header {
+                padding: 1.5rem;
+                text-align: center;
+                border-radius: 15px;
+            }
+
+            .sessions-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .sessions-header p {
+                font-size: 0.9rem;
+            }
+
+            .session-card {
+                padding: 1.5rem;
+                border-radius: 15px;
+                margin-bottom: 1.5rem;
+            }
+
+            .session-title {
+                font-size: 1.1rem;
+            }
+
+            .session-meta {
+                font-size: 0.85rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+
+            /* Mobile card layout - single column */
+            .col-12.col-sm-6.col-md-6.col-lg-4.col-xl-4 {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            /* Mobile badge and meta styling */
+            .session-card .badge {
+                align-self: flex-start;
+                margin-top: 0.5rem;
+            }
+
+            .session-meta span {
+                display: block;
+                margin-bottom: 0.25rem;
+            }
+
+            .session-meta span:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        /* Tablet responsive adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .main-content {
+                padding: 1.25rem;
+            }
+
+            .sessions-header {
+                padding: 1.75rem;
+            }
+
+            .session-card {
+                padding: 1.75rem;
+            }
+
+            /* Tablet: 2 columns (col-md-6) */
+            .col-md-6 {
+                flex: 0 0 auto;
+                width: 50%;
+            }
+
+            /* Tablet badge styling */
+            .session-card .badge {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+
+        /* Desktop responsive adjustments */
+        @media (min-width: 1025px) {
+            /* Desktop: 3 columns (col-lg-4) */
+            .col-lg-4 {
+                flex: 0 0 auto;
+                width: 33.333333%;
+            }
+
+            /* Desktop badge styling */
+            .session-card .badge {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <!-- Sidebar -->
-    {% include 'myapp/_sidebar.html' %}
+    {% include 'trainer/_sidebar.html' %}
 
     <!-- Main Content -->
     <div class="main-content">
@@ -136,14 +386,14 @@
                 {% if sessions %}
                 <div class="row">
                     {% for session in sessions %}
-                    <div class="col-lg-6 col-md-12 mb-4">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-4">
                         <div class="session-card">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-3 flex-column flex-sm-row">
                                 <h5 class="session-title">
                                     <i class="fas fa-video me-2 text-primary"></i>
                                     {{ session.title }}
                                 </h5>
-                                <span class="badge bg-info">
+                                <span class="badge bg-info mt-2 mt-sm-0 align-self-start align-self-sm-center">
                                     <i class="fas fa-calendar me-1"></i>
                                     {{ session.upload_date|date:"M d, Y" }}
                                 </span>
@@ -151,10 +401,12 @@
 
                             <div class="session-meta mb-3">
                                 <i class="fas fa-user-graduate me-1"></i>
-                                Uploaded by: {{ session.trainer.user.get_full_name|default:session.trainer.user.username }}
-                                <span class="mx-2">•</span>
-                                <i class="fas fa-clock me-1"></i>
-                                {{ session.upload_date|date:"h:i A" }}
+                                <span class="d-block d-sm-inline">Uploaded by: {{ session.trainer.user.get_full_name|default:session.trainer.user.username }}</span>
+                                <span class="mx-2 d-none d-sm-inline">•</span>
+                                <span class="d-block d-sm-inline mt-1 mt-sm-0">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ session.upload_date|date:"h:i A" }}
+                                </span>
                             </div>
 
                             {% if session.description %}
@@ -168,7 +420,7 @@
                                 {% if session.session_url %}
                                 <div class="d-flex align-items-center justify-content-center flex-column" style="height: 200px; background: #f8f9fa;">
                                     <i class="fas fa-link fa-3x mb-3 text-primary"></i>
-                                    <a href="{{ session.session_url }}" target="_blank" class="btn btn-primary">
+                                    <a href="{{ session.session_url }}" target="_blank" class="btn btn-primary btn-sm">
                                         <i class="fas fa-external-link-alt me-2"></i>
                                         Watch Session
                                     </a>
@@ -199,5 +451,162 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <script>
+        // Enhanced Sidebar Management
+        class SidebarManager {
+            constructor() {
+                this.sidebar = null;
+                this.toggleBtn = null;
+                this.isMobile = window.innerWidth <= 768;
+                this.init();
+            }
+
+            init() {
+                this.sidebar = document.querySelector('.sidebar');
+                this.toggleBtn = document.querySelector('.sidebar-toggle');
+
+                if (!this.sidebar || !this.toggleBtn) {
+                    console.error('Sidebar or toggle button not found!');
+                    return;
+                }
+
+                this.setupEventListeners();
+                this.setInitialState();
+                console.log('🍔 Hamburger Sidebar Manager initialized');
+            }
+
+            setupEventListeners() {
+                // Toggle button click
+                this.toggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleSidebar();
+                });
+
+                // Click outside to close on mobile
+                document.addEventListener('click', (e) => {
+                    if (this.isMobile && this.sidebar.classList.contains('active')) {
+                        if (!this.sidebar.contains(e.target) && !this.toggleBtn.contains(e.target)) {
+                            this.closeSidebar();
+                        }
+                    }
+                });
+
+                // Window resize handler
+                window.addEventListener('resize', () => {
+                    this.handleResize();
+                });
+
+                // Prevent sidebar close when clicking inside sidebar on mobile
+                this.sidebar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+
+            setInitialState() {
+                // Force hamburger to show on mobile, hide on desktop
+                if (window.innerWidth <= 768) {
+                    this.sidebar.style.transform = 'translateX(-100%)';
+                    this.sidebar.classList.remove('active');
+                    this.toggleBtn.style.display = 'block';
+                    this.toggleBtn.style.zIndex = '9999';
+                    console.log('📱 Mobile mode: Hamburger VISIBLE, sidebar hidden');
+                } else {
+                    this.sidebar.style.transform = 'translateX(0)';
+                    this.sidebar.classList.remove('active');
+                    this.toggleBtn.style.display = 'none';
+                    console.log('💻 Desktop mode: Hamburger HIDDEN, sidebar shown');
+                }
+
+                console.log(`📏 Screen width: ${window.innerWidth}px, Button display: ${this.toggleBtn.style.display}`);
+            }
+
+            toggleSidebar() {
+                if (this.isMobile) {
+                    this.sidebar.classList.toggle('active');
+                    if (this.sidebar.classList.contains('active')) {
+                        console.log('🔓 Sidebar opened');
+                    } else {
+                        console.log('🔒 Sidebar closed');
+                    }
+                }
+            }
+
+            closeSidebar() {
+                if (this.isMobile) {
+                    this.sidebar.classList.remove('active');
+                    console.log('🔒 Sidebar closed (outside click)');
+                }
+            }
+
+            handleResize() {
+                const wasMobile = this.isMobile;
+                this.isMobile = window.innerWidth <= 768;
+
+                if (wasMobile !== this.isMobile) {
+                    console.log(`📱 Screen size changed: ${wasMobile ? 'desktop' : 'mobile'} → ${this.isMobile ? 'mobile' : 'desktop'}`);
+                    this.setInitialState();
+                }
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Session page loading...');
+
+            // Force hamburger button visibility check
+            setTimeout(() => {
+                const toggleBtn = document.querySelector('.sidebar-toggle');
+                const screenWidth = window.innerWidth;
+
+                if (screenWidth <= 768) {
+                    toggleBtn.style.display = 'block';
+                    toggleBtn.style.zIndex = '9999';
+                    console.log('🔴 FORCE SHOWING HAMBURGER on mobile');
+                } else {
+                    toggleBtn.style.display = 'none';
+                    console.log('🟢 FORCE HIDING HAMBURGER on desktop');
+                }
+
+                console.log(`📏 Current screen width: ${screenWidth}px`);
+                console.log(`🍔 Hamburger display: ${toggleBtn.style.display}`);
+            }, 100);
+
+            // Initialize sidebar manager
+            const sidebarManager = new SidebarManager();
+
+            // Add enhanced hover effects to session cards
+            const sessionCards = document.querySelectorAll('.session-card');
+            sessionCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 12px 35px rgba(0,0,0,0.15)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+                });
+            });
+
+            // Enhanced external link handling
+            const externalLinks = document.querySelectorAll('a[href*="youtube.com"], a[href*="drive.google"], a[href*="meet.google"], a[href*="zoom.us"]');
+            externalLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    console.log(`🔗 Opening external link: ${url}`);
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                });
+            });
+
+            console.log(`✅ Session page fully loaded - ${sessionCards.length} session cards found`);
+        });
+
+        // Global toggle function for backward compatibility
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            if (window.innerWidth <= 768 && sidebar) {
+                sidebar.classList.toggle('active');
+            }
+        }
+    </script>

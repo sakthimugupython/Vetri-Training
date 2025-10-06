@@ -10,31 +10,132 @@
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            --card-shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
         }
 
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundMove 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(1deg); }
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            z-index: 999;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        @media (min-width: 992px) {
+            .sidebar {
+                transform: translateX(0);
+                position: fixed;
+            }
+
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Mobile backdrop */
+        .mobile-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Main content */
         .main-content {
-            margin-left: 230px;
-            padding: 2rem;
+            margin-left: 300px;
+            padding: 1rem;
             min-height: 100vh;
             background: #f8f9fa;
         }
 
-        /* Hero Header */
+        .sidebar-nav .nav-link {
+            color: #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link.active {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .sidebar .logo {
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Enhanced Hero Header */
         .hero-header {
             background: var(--primary-gradient);
             color: white;
-            padding: 3rem 2rem;
-            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            border-radius: var(--border-radius);
             margin-bottom: 2rem;
             box-shadow: var(--card-shadow);
             position: relative;
@@ -58,7 +159,7 @@
         }
 
         .hero-title {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
             display: flex;
@@ -67,23 +168,22 @@
         }
 
         .hero-subtitle {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.9;
-            margin-bottom: 0;
         }
 
         /* Form Container */
         .form-container {
             background: white;
-            border-radius: 20px;
-            padding: 3rem;
+            border-radius: var(--border-radius);
+            padding: 2rem;
             box-shadow: var(--card-shadow);
             margin-bottom: 2rem;
         }
 
         .form-title {
             color: #2d3748;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
             display: flex;
@@ -93,38 +193,46 @@
 
         .form-subtitle {
             color: #718096;
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Form Styling */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
+            font-size: 0.9rem;
             margin-bottom: 1.5rem;
         }
 
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 576px) {
+            .form-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+            .main-content {
+            margin-left: 0px;
+            padding: 1rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        }
+
+        /* Form Elements */
         .form-label {
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 0.3rem;
-            font-size: 0.95rem;
+            gap: 0.5rem;
         }
 
         .form-control, .form-select {
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            padding: 0.8rem 1rem;
+            padding: 0.75rem 1rem;
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             background: #f8f9fa;
         }
 
@@ -132,15 +240,7 @@
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             background: white;
-        }
-
-        .form-control::placeholder {
-            color: #a0aec0;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 120px;
+            font-size: 16px;
         }
 
         /* Action Buttons */
@@ -156,126 +256,161 @@
             background: var(--success-gradient);
             border: none;
             border-radius: 12px;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             color: white;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.9rem;
             box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-            transition: all 0.3s ease;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 48px;
         }
 
         .btn-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-            color: white;
         }
 
         .btn-cancel {
             background: #e2e8f0;
             border: none;
             border-radius: 12px;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             color: #4a5568;
             font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            transition: var(--transition);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 48px;
         }
 
         .btn-cancel:hover {
             background: #cbd5e0;
             color: #2d3748;
             text-decoration: none;
-            transform: translateY(-1px);
         }
 
-        /* Tips Section */
-        .tips-section {
-            background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
-            border: 1px solid #81e6d9;
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-top: 2rem;
+        /* Character counter */
+        .char-counter {
+            font-size: 0.8rem;
+            color: #718096;
+            text-align: right;
+            margin-top: 0.25rem;
         }
 
-        .tips-title {
-            color: #234e52;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .char-counter.warning { color: #f6ad55; }
+        .char-counter.danger { color: #f56565; }
+
+        /* Enhanced hamburger button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-size: 1.25rem;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            display: block;
         }
 
-        .tips-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
 
-        .tips-item {
-            color: #2c7a7b;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
+        .sidebar-toggle:active {
+            transform: scale(0.95);
         }
 
-        .tips-item:last-child {
-            margin-bottom: 0;
-        }
+        /* Mobile responsive */
+        @media (max-width: 575px) {
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
+            .btn-submit, .btn-cancel {
+                width: 100%;
+                justify-content: center;
             }
 
             .hero-header {
-                padding: 2rem 1rem;
-            }
-
-            .hero-title {
-                font-size: 2rem;
-                flex-direction: column;
+                padding: 1.5rem 1rem;
                 text-align: center;
             }
 
-            .form-container {
-                padding: 2rem 1.5rem;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .form-actions {
+            .hero-title {
+                font-size: 1.5rem;
                 flex-direction: column;
+                text-align: center;
+            }
+            .main-content {
+            margin-left: 0px;
+            padding: 1rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        }
+
+        @media (min-width: 768px) {
+            .hero-header {
+                padding: 3rem 2rem;
             }
 
-            .btn-submit, .btn-cancel {
-                justify-content: center;
+            .hero-title {
+                font-size: 2.2rem;
             }
+
+            .form-container {
+                padding: 3rem;
+            }
+            .main-content {
+            margin-left: 0px;
+            padding: 1rem;
+            min-height: 100vh;
+            background: #f8f9fa;
         }
+        }
+
+        @media (min-width: 769px) {
+            .hero-header {
+                padding: 3rem 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .form-container {
+                padding: 3rem;
+            }
+            .main-content {
+            margin-left: 300px;
+            padding: 1rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }}
     </style>
 </head>
 <body>
     <!-- Sidebar Toggle for Mobile -->
-    <button class="sidebar-toggle d-lg-none" aria-label="Toggle sidebar" style="position:fixed;top:18px;left:18px;z-index:200;background:none;border:none;font-size:2rem;color:#667eea;">
+    <button class="sidebar-toggle d-lg-none" onclick="toggleSidebar()">
         <i class="fas fa-bars"></i>
     </button>
 
     <div class="d-flex">
+        <!-- Mobile backdrop -->
+        <div class="mobile-backdrop" onclick="toggleSidebar()"></div>
+
         {% include 'myapp/_sidebar.html' %}
 
         <div class="main-content w-100">
@@ -304,30 +439,25 @@
                     {% csrf_token %}
 
                     <div class="form-grid">
-                        <div class="form-group">
+                        <div>
                             <label for="title" class="form-label">
-                                <i class="fas fa-heading"></i>
-                                Announcement Title
+                                <i class="fas fa-heading"></i> Announcement Title
                             </label>
                             <input type="text" class="form-control" id="title" name="title"
-                                   placeholder="e.g., New Course Available, System Maintenance Notice"
-                                   required>
+                                   placeholder="e.g., New Course Available, System Maintenance Notice" required>
                         </div>
 
-                        <div class="form-group">
+                        <div>
                             <label for="description" class="form-label">
-                                <i class="fas fa-align-left"></i>
-                                Short Description
+                                <i class="fas fa-align-left"></i> Short Description
                             </label>
                             <input type="text" class="form-control" id="description" name="description"
-                                   placeholder="Brief summary of the announcement"
-                                   required>
+                                   placeholder="Brief summary of the announcement" required>
                         </div>
 
-                        <div class="form-group">
+                        <div>
                             <label for="target_audience" class="form-label">
-                                <i class="fas fa-users"></i>
-                                Target Audience
+                                <i class="fas fa-users"></i> Target Audience
                             </label>
                             <select class="form-select" id="target_audience" name="target_audience" required>
                                 <option value="all">All Users</option>
@@ -336,34 +466,32 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div>
                             <label for="post_date" class="form-label">
-                                <i class="fas fa-calendar"></i>
-                                Post Date
+                                <i class="fas fa-calendar"></i> Post Date
                             </label>
                             <input type="date" class="form-control" id="post_date" name="post_date" required>
                         </div>
 
-                        <div class="form-group" style="grid-column: 1 / -1;">
+                        <div style="grid-column: 1 / -1;">
                             <label for="content" class="form-label">
-                                <i class="fas fa-edit"></i>
-                                Full Message
+                                <i class="fas fa-edit"></i> Full Message
+                                <span class="text-muted">(500 characters max)</span>
                             </label>
-                            <textarea class="form-control" id="content" name="content" rows="5"
-                                      placeholder="Write your detailed announcement message here. You can include links, formatting, and important details that your audience needs to know."
-                                      required></textarea>
+                            <textarea class="form-control" id="content" name="content" rows="5" maxlength="500"
+                                      placeholder="Write your detailed announcement message here..." required></textarea>
+                            <div class="char-counter">
+                                <span id="char-count">0</span>/500 characters
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Form Actions -->
                     <div class="form-actions">
                         <a href="{% url 'announcements' %}" class="btn-cancel">
-                            <i class="fas fa-times"></i>
-                            Cancel
+                            <i class="fas fa-times"></i> Cancel
                         </a>
                         <button type="submit" class="btn-submit">
-                            <i class="fas fa-paper-plane"></i>
-                            Create Announcement
+                            <i class="fas fa-paper-plane"></i> Create Announcement
                         </button>
                     </div>
                 </form>
@@ -372,48 +500,117 @@
     </div>
 
     <script>
-        // Sidebar toggle for mobile
-        document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced mobile sidebar functionality
+        function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.querySelector('.mobile-backdrop');
             const toggleBtn = document.querySelector('.sidebar-toggle');
 
-            if (sidebar && toggleBtn) {
-                function closeSidebar() {
-                    sidebar.style.transform = 'translateX(-100%)';
-                }
+            if (window.innerWidth < 992) {
+                const isActive = sidebar.classList.contains('active');
 
-                function openSidebar() {
-                    sidebar.style.transform = 'translateX(0)';
+                if (isActive) {
+                    // Close sidebar
+                    sidebar.classList.remove('active');
+                    backdrop.classList.remove('active');
+                } else {
+                    // Open sidebar
+                    sidebar.classList.add('active');
+                    backdrop.classList.add('active');
                 }
+            }
+        }
 
-                function checkWidth() {
-                    if (window.innerWidth < 992) {
-                        closeSidebar();
-                        toggleBtn.style.display = 'block';
-                    } else {
-                        sidebar.style.transform = '';
-                        toggleBtn.style.display = 'none';
-                    }
-                }
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.querySelector('.mobile-backdrop');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
 
-                checkWidth();
-                toggleBtn.addEventListener('click', function() {
-                    if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === 'translateX(0)') {
-                        closeSidebar();
-                    } else {
-                        openSidebar();
-                    }
-                });
-                window.addEventListener('resize', checkWidth);
+            if (window.innerWidth < 992 &&
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggleBtn.contains(event.target)) {
+                toggleSidebar();
             }
         });
 
-        // Set today's date as default
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.querySelector('.mobile-backdrop');
+
+            if (window.innerWidth >= 992) {
+                // Desktop mode
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.querySelector('.mobile-backdrop');
+
+            if (window.innerWidth < 992) {
+                // Mobile initialization
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        });
+
+        // Character counter
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('content');
+            const charCount = document.getElementById('char-count');
+            const charCounter = document.querySelector('.char-counter');
+
+            if (textarea && charCount) {
+                function updateCharCount() {
+                    const length = textarea.value.length;
+                    charCount.textContent = length;
+                    charCounter.className = 'char-counter';
+                    if (length > 450) charCounter.classList.add('danger');
+                    else if (length > 400) charCounter.classList.add('warning');
+                }
+
+                textarea.addEventListener('input', updateCharCount);
+                updateCharCount();
+            }
+        });
+
+        // Set default date
         document.addEventListener('DOMContentLoaded', function() {
             const dateInput = document.getElementById('post_date');
             if (dateInput) {
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.value = today;
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.btn-submit');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const content = document.getElementById('content').value.trim();
+
+            if (!title || !description || !content) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Create Announcement';
+                return false;
+            }
+
+            if (content.length > 500) {
+                e.preventDefault();
+                alert('Message content cannot exceed 500 characters.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Create Announcement';
+                return false;
             }
         });
     </script>
